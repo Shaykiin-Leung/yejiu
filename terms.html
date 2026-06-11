@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户协议 - 夜啾</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', 'Noto Sans SC', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-black text-zinc-300 min-h-screen py-10 px-6 sm:px-12 selection:bg-zinc-800 selection:text-white">
+    <div class="max-w-3xl mx-auto bg-zinc-950 border border-zinc-900 rounded-2xl p-8 sm:p-12 shadow-2xl">
+        <h1 class="text-3xl font-bold text-white mb-2">用户使用协议</h1>
+        <p class="text-sm text-zinc-500 mb-8">更新日期：2026年6月3日</p>
+
+        <div class="space-y-6 text-sm leading-relaxed">
+            <p>欢迎您使用「夜啾」移动客户端软件（以下简称“本软件”）。在使用本软件前，请您务必仔细阅读并理解本《用户使用协议》（以下简称“协议”）。一旦您安装、复制、下载或以其他方式使用本软件，即表示您已阅读并同意受本协议各项条款的约束。</p>
+
+            <section>
+                <h2 class="text-lg font-semibold text-white mb-2">一、服务内容与合理使用</h2>
+                <p class="mb-2">1. 本软件为用户提供2026年美加墨世界杯赛程信息查询、熬夜打卡记录、健康评分参考以及观赛人格图鉴生成等娱乐与生活辅助服务。</p>
+                <p class="mb-2">2. 本软件提供的所有“健康评估”、“调理建议”和“补觉方案”仅为基于一般性健康知识的分析和娱乐性互动，<strong class="text-white">不构成任何专业的医学诊断、医疗建议或治疗方案</strong>。用户在做出任何影响身体健康的决策前，应咨询专业医师。</p>
+                <p>3. 用户同意在使用本软件时遵守国家法律法规，不得利用本软件从事任何违法违规活动，包括但不限于发布违法言论、侵犯他人隐私或进行网络赌球等行为。</p>
+            </section>
+
+            <section>
+                <h2 class="text-lg font-semibold text-white mb-2">二、知识产权声明</h2>
+                <p class="mb-2">1. 本软件的全部内容，包括但不限于文本、图表、图形、界面设计、LOGO、源代码、音视频等，均受著作权法、商标法及其他相关法律法规的保护，版权归本软件开发者所有。</p>
+                <p>2. 未经开发者书面许可，任何单位和个人不得对本软件进行反向工程、反向汇编、反向编译，或以任何方式复制、修改、传播本软件的内容。</p>
+            </section>
+
+            <section>
+                <h2 class="text-lg font-semibold text-white mb-2">三、免责声明</h2>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li><strong class="text-white">数据准确性：</strong> 虽然我们努力确保本软件展示的世界杯赛程、比分以及球队信息的准确性，但由于网络延迟或第三方API接口的不确定性，我们不保证赛程比分的绝对实时性与准确性，亦不对因参考比分而产生的任何纠纷承担责任。</li>
+                    <li><strong class="text-white">服务稳定性：</strong> 因黑客攻击、系统维护、网络故障、自然灾害等不可抗力导致本软件服务中断或数据丢失的，开发者将尽最大努力配合修复，但不承担由此引起的任何间接损失。</li>
+                    <li><strong class="text-white">第三方链接：</strong> 本软件中可能包含前往第三方平台的活动或外卖红包福利链接，用户点击此类链接所进行的交易或产生的一切纠纷均由用户与该第三方平台自行协商解决，本软件不承担法律责任。</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-lg font-semibold text-white mb-2">四、协议的修改与终止</h2>
+                <p>1. 开发者有权在必要时修改本协议条款。一旦协议条款发生变更，我们将在本页面进行更新并公示。若您不同意修改后的条款，应立即停止使用本软件。</p>
+                <p>2. 如用户违反本协议的规定，开发者有权在不事先通知的情况下随时限制、暂停或终止该用户使用本软件的全部或部分功能。</p>
+            </section>
+
+            <section>
+                <h2 class="text-lg font-semibold text-white mb-2">五、法律管辖与争议解决</h2>
+                <p>本协议的订立、执行、解释及争议的解决均应适用中华人民共和国法律。如双方就本协议内容或其执行发生任何争议，双方应进行友好协商；协商不成的，任何一方均可向开发者所在地人民法院提起诉讼。</p>
+            </section>
+        </div>
+
+        <div class="mt-12 pt-6 border-t border-zinc-900 text-center">
+            <button onclick="history.back()" class="px-6 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-sm transition font-medium">返回</button>
+        </div>
+    </div>
+    <script>
+        (function () {
+            const originalBack = window.history.back.bind(window.history);
+            window.history.back = function () {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('from') === 'profile') {
+                    window.location.href = 'index_worldcup.html#profile';
+                    return;
+                }
+                originalBack();
+            };
+        })();
+    </script>
+</body>
+</html>

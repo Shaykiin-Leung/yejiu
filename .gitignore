@@ -1,0 +1,21 @@
+# Backups & temp
+*.bak
+_tmp_video_frames/
+diff_index.txt
+
+# Preview duplicates
+index_preview.html
+index_worldcup_preview.html
+
+# Notes & scratch (Chinese-named md files)
+*.md
+
+# PDFs (large, no need in repo)
+*.pdf
+
+# APK — uncomment if you want to track it in git (not recommended for large files)
+# yejiu.apk
+
+# OS
+.DS_Store
+Thumbs.db
