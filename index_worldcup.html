@@ -1554,6 +1554,28 @@
                     </div>
                 </div>
 
+                <!-- 数据备份与迁移板块 -->
+                <div class="bg-[#121212]/50 backdrop-blur-md border border-[#222222]/80 rounded-2xl overflow-hidden">
+                    <div class="px-4 pt-4 pb-2 flex items-center gap-2 border-b border-[#222222]/60">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-zinc-400"></i>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">数据同步与备份</span>
+                    </div>
+                    <div class="px-4 py-3">
+                        <button onclick="openSyncModal()" class="w-full rounded-2xl border border-white/[0.06] bg-black/25 px-3.5 py-3 active:scale-[0.98] transition flex items-center justify-between gap-3 text-left">
+                            <span class="flex items-center gap-3">
+                                <span class="h-9 w-9 shrink-0 rounded-xl border border-white/[0.06] bg-white/[0.035] flex items-center justify-center">
+                                    <i data-lucide="database" class="h-4 w-4 text-zinc-500"></i>
+                                </span>
+                                <span>
+                                    <span class="block text-[12px] font-black text-white">跨端数据同步</span>
+                                    <span class="mt-0.5 block text-[9px] font-bold text-zinc-600">在浏览器网页版与安装的 App 之间迁移/备份数据</span>
+                                </span>
+                            </span>
+                            <i data-lucide="chevron-right" class="h-4 w-4 shrink-0 text-zinc-700"></i>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- 第四板块：帮助说明 -->
                 <div class="bg-[#121212]/50 backdrop-blur-md border border-[#222222]/80 rounded-2xl overflow-hidden">
                     <div class="px-4 pt-4 pb-2 flex items-center gap-2 border-b border-[#222222]/60">
@@ -12630,6 +12652,174 @@ function generateDailyStatus(checkins, dateStr) {
             });
         }
 
+        // ============ 新增：数据备份与迁移 (同步码) 逻辑 ============
+        function openSyncModal() {
+            const modal = document.getElementById('yejiu-sync-modal');
+            if (modal) {
+                // 重置相关输入和显示
+                const exportArea = document.getElementById('sync-export-area');
+                if (exportArea) {
+                    exportArea.value = '';
+                    exportArea.classList.add('hidden');
+                }
+                const importInput = document.getElementById('sync-import-input');
+                if (importInput) importInput.value = '';
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                refreshLucideIcons();
+            }
+        }
+
+        function closeSyncModal() {
+            const modal = document.getElementById('yejiu-sync-modal');
+            if (modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function handleSyncExport() {
+            try {
+                const backupData = {
+                    'worldcup_subs': localStorage.getItem('worldcup_subs'),
+                    'worldcup_favs': localStorage.getItem('worldcup_favs'),
+                    'worldcup_watched': localStorage.getItem('worldcup_watched'),
+                    'worldcup_daily_journal': localStorage.getItem('worldcup_daily_journal'),
+                    'worldcup_health_plans': localStorage.getItem('worldcup_health_plans'),
+                    'user_avatar_team': localStorage.getItem('user_avatar_team'),
+                    'football_data_api_key': localStorage.getItem('football_data_api_key'),
+                    
+                    // 包含沙盒状态 (调试用)
+                    'sandbox_mock_health': localStorage.getItem('sandbox_mock_health'),
+                    'sandbox_health_sleepDebt': localStorage.getItem('sandbox_health_sleepDebt'),
+                    'sandbox_health_dangerCount': localStorage.getItem('sandbox_health_dangerCount'),
+                    'sandbox_health_challengeCount': localStorage.getItem('sandbox_health_challengeCount'),
+                    'sandbox_health_consecutiveDangerStreak': localStorage.getItem('sandbox_health_consecutiveDangerStreak'),
+                    'sandbox_health_maxDangerStreak': localStorage.getItem('sandbox_health_maxDangerStreak'),
+                    'sandbox_health_recent3DayDebt': localStorage.getItem('sandbox_health_recent3DayDebt'),
+                    'sandbox_date_override': localStorage.getItem('sandbox_date_override')
+                };
+
+                // 清除 null 和 undefined 键，压缩体积
+                Object.keys(backupData).forEach(key => {
+                    if (backupData[key] === null || backupData[key] === undefined) {
+                        delete backupData[key];
+                    }
+                });
+
+                const jsonStr = JSON.stringify(backupData);
+                // 使用 UTF-8 安全的 Base64 编码方式
+                const base64Str = btoa(unescape(encodeURIComponent(jsonStr)));
+
+                // 填充到 textarea 兜底显示
+                const exportArea = document.getElementById('sync-export-area');
+                if (exportArea) {
+                    exportArea.value = base64Str;
+                    exportArea.classList.remove('hidden');
+                }
+
+                // 写入剪贴板
+                copyTextToClipboard(base64Str, () => {
+                    showToast('同步码已生成并自动复制！📋');
+                }, () => {
+                    showToast('自动复制失败，请手动长按下方文本框进行复制');
+                });
+            } catch (err) {
+                console.error(err);
+                showToast('生成同步码失败，请重试');
+            }
+        }
+
+        function copyTextToClipboard(text, onSuccess, onFailure) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(onSuccess).catch(err => {
+                    fallbackCopyText(text, onSuccess, onFailure);
+                });
+            } else {
+                fallbackCopyText(text, onSuccess, onFailure);
+            }
+        }
+
+        function fallbackCopyText(text, onSuccess, onFailure) {
+            try {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+                textArea.style.opacity = "0";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                if (successful) {
+                    onSuccess();
+                } else {
+                    onFailure();
+                }
+            } catch (err) {
+                onFailure();
+            }
+        }
+
+        function handleSyncImport() {
+            const inputArea = document.getElementById('sync-import-input');
+            if (!inputArea) return;
+            const base64Str = inputArea.value.trim();
+            if (!base64Str) {
+                showToast("请先粘贴同步码");
+                return;
+            }
+
+            try {
+                // 安全的 Base64 解码，支持 UTF-8
+                const jsonStr = decodeURIComponent(escape(atob(base64Str)));
+                const backupData = JSON.parse(jsonStr);
+
+                if (typeof backupData !== 'object' || backupData === null) {
+                    showToast("同步码格式不正确");
+                    return;
+                }
+
+                if (!confirm("导入数据将完全覆盖此设备/App的当前观赛记录、打卡记录、头像等。此操作不可逆！\n\n确定要继续吗？")) {
+                    return;
+                }
+
+                // 清除当前的本地缓存
+                localStorage.removeItem('worldcup_subs');
+                localStorage.removeItem('worldcup_favs');
+                localStorage.removeItem('worldcup_watched');
+                localStorage.removeItem('worldcup_daily_journal');
+                localStorage.removeItem('worldcup_health_plans');
+                localStorage.removeItem('user_avatar_team');
+                localStorage.removeItem('football_data_api_key');
+                // 沙盒缓存
+                localStorage.removeItem('sandbox_mock_health');
+                localStorage.removeItem('sandbox_health_sleepDebt');
+                localStorage.removeItem('sandbox_health_dangerCount');
+                localStorage.removeItem('sandbox_health_challengeCount');
+                localStorage.removeItem('sandbox_health_consecutiveDangerStreak');
+                localStorage.removeItem('sandbox_health_maxDangerStreak');
+                localStorage.removeItem('sandbox_health_recent3DayDebt');
+                localStorage.removeItem('sandbox_date_override');
+
+                // 写入导入的数据
+                Object.keys(backupData).forEach(key => {
+                    localStorage.setItem(key, backupData[key]);
+                });
+
+                showToast("数据导入成功！正在为您重载页面... 🌟");
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } catch (err) {
+                console.error(err);
+                showToast("解析同步码失败，请确保同步码完整");
+            }
+        }
+
         // ── 沙盒：解锁终极人格 ──
         function simulateEndgameUnlock() {
             localStorage.setItem('endgame_unlocked', 'true');
@@ -13645,6 +13835,54 @@ function generateDailyStatus(checkins, dateStr) {
             <div class="flex-grow overflow-y-auto p-4 no-scrollbar">
                 <div class="grid grid-cols-3 gap-3" id="avatar-grid-container">
                     <!-- 由 JS 动态填充 48 队头像 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 数据同步与迁移模态弹窗 ============ -->
+    <div id="yejiu-sync-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] hidden items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-zinc-900 rounded-3xl w-full max-w-sm flex flex-col overflow-hidden animate-fade-in shadow-2xl p-5 gap-4">
+            <!-- 头部 -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-white">数据同步与迁移</h3>
+                    <p class="text-[9px] text-zinc-500 font-semibold tracking-wider uppercase mt-0.5">Data Sync & Backup</p>
+                </div>
+                <button onclick="closeSyncModal()" class="text-zinc-500 hover:text-white text-lg p-1">&times;</button>
+            </div>
+            
+            <!-- 说明 -->
+            <p class="text-[10.5px] text-zinc-400 leading-relaxed">
+                网页版与 App (APK) 版本的浏览器沙箱完全隔离。您可以通过下方的“数据同步码”来迁移或同步您的订阅、打卡、主队等本地记录。
+            </p>
+
+            <div class="space-y-4">
+                <!-- 导出部分 -->
+                <div class="rounded-2xl bg-[#121212]/60 border border-white/[0.04] p-3.5 space-y-2">
+                    <div class="text-[11px] font-bold text-white flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        备份数据 (当前设备 -> 其他设备)
+                    </div>
+                    <p class="text-[9px] text-zinc-500 leading-normal">生成您的专属数据同步码，复制后在其他浏览器或安装的 APK 中导入即可。</p>
+                    <button onclick="handleSyncExport()" class="w-full py-2.5 rounded-xl bg-zinc-900 border border-white/[0.06] text-zinc-200 text-[10px] font-bold hover:bg-zinc-850 active:scale-95 transition flex items-center justify-center gap-1">
+                        <i data-lucide="copy" class="w-3 h-3"></i> 生成并复制同步码
+                    </button>
+                    <!-- 临时展示区域，防止复制剪贴板失败 -->
+                    <textarea id="sync-export-area" readonly class="hidden w-full h-16 mt-2 p-2 bg-black border border-zinc-900 rounded-lg text-[8px] font-mono text-emerald-400 outline-none resize-none word-break-break-all" placeholder="同步码生成后会在此显示..."></textarea>
+                </div>
+
+                <!-- 导入部分 -->
+                <div class="rounded-2xl bg-[#121212]/60 border border-white/[0.04] p-3.5 space-y-2">
+                    <div class="text-[11px] font-bold text-white flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                        恢复数据 (导入同步码)
+                    </div>
+                    <p class="text-[9px] text-zinc-500 leading-normal">粘贴您在其他地方复制的同步码（一长串字符），覆盖当前本地数据。</p>
+                    <textarea id="sync-import-input" class="w-full h-16 p-2 bg-black border border-zinc-900 focus:border-zinc-800 rounded-xl text-[9.5px] text-zinc-300 placeholder-zinc-700 outline-none resize-none word-break-break-all" placeholder="请在此处长按粘贴同步码..."></textarea>
+                    <button onclick="handleSyncImport()" class="w-full py-2.5 rounded-xl bg-[#00e676] text-black text-[10px] font-bold hover:bg-[#00c862] active:scale-95 transition flex items-center justify-center gap-1">
+                        <i data-lucide="upload" class="w-3 h-3"></i> 开始恢复数据
+                    </button>
                 </div>
             </div>
         </div>
