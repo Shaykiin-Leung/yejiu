@@ -285,6 +285,14 @@
   <script>
     (function initEntry() {
       const ua = navigator.userAgent || "";
+
+      // 🚨 自动识别 APK 环境：如果是在 HBuilderX 打包的 App WebView 中（含 Html5Plus 标识）
+      // 或者是 window.plus 已经就绪，说明用户已经安装了 App 并正在其中运行，直接重定向到主功能页！
+      if (ua.indexOf('Html5Plus') > -1 || window.plus) {
+        window.location.replace('index_worldcup.html');
+        return;
+      }
+
       const platform = navigator.platform || "";
       const isIOS = /iPhone|iPad|iPod/i.test(ua) || (platform === "MacIntel" && navigator.maxTouchPoints > 1);
       const isAndroid = /Android/i.test(ua);

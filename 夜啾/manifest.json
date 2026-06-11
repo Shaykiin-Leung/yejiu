@@ -10,7 +10,7 @@
     "icons" : {
         "72" : "icon.png"
     },
-    "launch_path" : "https://yejiu.vercel.app",
+    "launch_path" : "https://yejiu.vercel.app/index_worldcup.html",
     "developer" : {
         "name" : "夜啾团队",
         "email" : "support@yejiu.app",
