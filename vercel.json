@@ -1,5 +1,9 @@
 {
   "version": 2,
+  "rewrites": [
+    { "source": "/", "destination": "/index_worldcup.html" },
+    { "source": "/download", "destination": "/download.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)\\.apk",
