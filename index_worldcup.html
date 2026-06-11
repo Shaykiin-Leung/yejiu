@@ -2,6 +2,7 @@
 <html lang="zh-CN" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <meta name="color-scheme" content="dark">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>夜啾 - 智能健康观赛护航指南</title>
     <!-- SEO 最佳实践：元数据设置 -->
@@ -70,6 +71,10 @@
             --host-blue: #2f6fb4;
             --host-ribbon: linear-gradient(90deg, var(--host-red) 0%, var(--host-green) 50%, var(--host-blue) 100%);
             --ease-ios: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        html, body {
+            color-scheme: dark;
         }
 
         body {
@@ -1019,6 +1024,18 @@
         @media (prefers-reduced-motion: reduce) {
             .persona-motion-overlay {
                 display: none !important;
+            }
+        }
+
+        /* 移动端/微信/安卓 WebView 兼容性修复：禁用高能耗且易导致图层隐形/渲染 bug 的 mask-image */
+        @media (max-width: 768px) {
+            .yejiu-hero-motion,
+            .yejiu-hero-motion video,
+            .yejiu-hero-motion img,
+            .yejiu-home-hero::before,
+            .yejiu-home-hero.has-motion::before {
+                -webkit-mask-image: none !important;
+                mask-image: none !important;
             }
         }
 </style>
