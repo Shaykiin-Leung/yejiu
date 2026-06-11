@@ -448,51 +448,7 @@
             </div>
         </div>
 
-        <!-- ══════ Huawei / OPPO Section ══════ -->
-        <div id="section-huawei" class="device-card fade-in">
-            <div class="android-header">
-                <div class="android-icon">📱</div>
-                <div class="android-title">华为 / OPPO 用户</div>
-                <div class="android-sub">推荐直接下载 APK 安装，安全可信</div>
-            </div>
-
-            <!-- Breathing download button -->
-            <div class="btn-download-wrap">
-                <div class="btn-download-glow"></div>
-                <a id="apk-btn-hw" href="yejiu.apk" class="btn-download" download="夜啾_v1.0.apk">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 15V3m0 12l-4-4m4 4l4-4"/><path d="M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/>
-                    </svg>
-                    <div class="btn-dl-label">
-                        <span class="btn-dl-main">下载 APK 安装包</span>
-                        <span class="btn-dl-sub">直链下载 · 安全无广告</span>
-                    </div>
-                </a>
-            </div>
-
-            <div class="download-meta">
-                <span>适配 Android 8.0+</span>
-                <span>约 15MB</span>
-                <span>无需注册</span>
-            </div>
-
-            <div class="hw-divider">或者试试应用商店</div>
-
-            <a id="store-btn-hw" href="#" class="hw-store-btn" onclick="openHuaweiStore(event)">
-                🏪 华为应用市场 / OPPO 软件商店搜索「夜啾」
-            </a>
-
-            <div class="install-tip">
-                <div class="install-tip-title">📋 下载后如何安装</div>
-                <div class="install-tip-steps">
-                    1. 打开「<b>文件管理器</b>」→ 下载 → yejiu.apk<br>
-                    2. 点击安装 → 如弹出风险提示，选「<b>继续安装</b>」<br>
-                    3. 安装完毕，桌面出现夜啾图标即成功 🎉
-                </div>
-            </div>
-        </div>
-
-        <!-- ══════ Regular Android Section ══════ -->
+        <!-- ══════ Android Section ══════ -->
         <div id="section-android" class="device-card fade-in">
             <div class="android-header">
                 <div class="android-icon">🤖</div>
@@ -523,7 +479,7 @@
                 <div class="install-tip-title">📋 下载后如何安装</div>
                 <div class="install-tip-steps">
                     1. 浏览器提示「<b>下载完成</b>」后，点击打开<br>
-                    2. 如提示「<b>未知来源</b>」，进入设置允许即可<br>
+                    2. 如系统提示风险，选择信任并继续安装即可<br>
                     3. 点击安装 → 等待完成 → 打开夜啾 🎉
                 </div>
             </div>
@@ -578,48 +534,22 @@
         var ua = navigator.userAgent || '';
 
         var isIOS = /iPhone|iPad|iPod/i.test(ua);
-        var isHuawei = /HUAWEI|HarmonyOS|honor/i.test(ua);
-        var isOPPO = /OPPO|OnePlus|Realme|realme/i.test(ua);
         var isAndroid = /Android/i.test(ua);
 
         if (isIOS) {
             document.getElementById('section-ios').style.display = 'block';
-        } else if (isHuawei || isOPPO) {
-            document.getElementById('section-huawei').style.display = 'block';
-        } else if (isAndroid) {
-            document.getElementById('section-android').style.display = 'block';
         } else {
-            // PC or unknown → show Android download as default (most flexible)
+            // Android, PC or unknown → show Android download card
             document.getElementById('section-android').style.display = 'block';
-            // Also patch text for PC visitors
-            var titleEl = document.querySelector('#section-android .android-title');
-            var subEl = document.querySelector('#section-android .android-sub');
-            if (titleEl) titleEl.textContent = '扫码 / 链接分发';
-            if (subEl) subEl.textContent = '用手机扫描下方链接，或直接分享页面给朋友';
+            if (!isAndroid) {
+                // PC visitors
+                var titleEl = document.querySelector('#section-android .android-title');
+                var subEl = document.querySelector('#section-android .android-sub');
+                if (titleEl) titleEl.textContent = '扫码 / 链接分发';
+                if (subEl) subEl.textContent = '用手机扫描下方链接，或直接分享页面给朋友';
+            }
         }
     })();
-
-    // ══════════════════════════════════════════
-    //  Huawei / OPPO Store Deep Link
-    // ══════════════════════════════════════════
-    function openHuaweiStore(e) {
-        e.preventDefault();
-        // Try protocol-based deep links, fall back to search page
-        var ua = navigator.userAgent || '';
-        if (/HUAWEI|HarmonyOS|honor/i.test(ua)) {
-            // Huawei AppGallery deep link
-            window.location.href = 'appmarket://search?keyword=夜啾';
-            setTimeout(function() {
-                window.open('https://appgallery.huawei.com/', '_blank');
-            }, 1500);
-        } else {
-            // OPPO Software Store
-            window.location.href = 'oppomarket://details?packagename=com.yejiu.app';
-            setTimeout(function() {
-                window.open('https://www.oppo.com/cn/app-market/', '_blank');
-            }, 1500);
-        }
-    }
 
     // ══════════════════════════════════════════
     //  iOS Tip Overlay
@@ -627,19 +557,14 @@
     // Auto show tip after 2s if iOS Safari
     if (/iPhone|iPad|iPod/i.test(navigator.userAgent) && !navigator.standalone) {
         setTimeout(function() {
-            document.getElementById('iosTip').classList.add('show');
+            const tip = document.getElementById('iosTip');
+            if (tip) tip.classList.add('show');
         }, 2000);
     }
     function closeIosTip() {
-        document.getElementById('iosTip').classList.remove('show');
+        const tip = document.getElementById('iosTip');
+        if (tip) tip.classList.remove('show');
     }
-
-    // ══════════════════════════════════════════
-    //  APK link — update this after Vercel deploy
-    // ══════════════════════════════════════════
-    // var APK_URL = 'https://your-domain.vercel.app/yejiu.apk';
-    // document.getElementById('apk-btn-hw').href = APK_URL;
-    // document.getElementById('apk-btn-android').href = APK_URL;
     </script>
 </body>
 </html>

@@ -257,22 +257,11 @@
           <div id="android-card" class="device-card hidden">
             <div class="device-label">Android / APK</div>
             <div class="device-title">下载夜啾 APK，直接开始看球。</div>
-            <div class="device-copy">适合小米、vivo、一加等安卓手机。若浏览器提示风险，请确认来源后继续安装。</div>
+            <div class="device-copy">直接下载安装包。若系统提示来源风险，请确认并继续安装。</div>
             <div class="actions">
               <a class="btn btn-apk" href="yejiu.apk" download>下载 APK</a>
               <a class="btn btn-ghost" href="index_worldcup.html">先用网页版体验</a>
             </div>
-          </div>
-
-          <div id="store-card" class="device-card hidden">
-            <div class="device-label">Huawei / OPPO</div>
-            <div class="device-title">可以直装，也可以去应用商店搜夜啾。</div>
-            <div class="device-copy">如果系统对 APK 限制较多，优先使用自带应用商店会更省心。</div>
-            <div class="actions">
-              <a class="btn btn-apk" href="yejiu.apk" download>下载 APK</a>
-              <a class="btn btn-ghost" href="index_worldcup.html">先用网页版体验</a>
-            </div>
-            <div class="store-note">亦可前往华为应用市场 / OPPO 软件商店搜索「夜啾」下载官方版本。</div>
           </div>
 
           <div id="desktop-card" class="device-card hidden">
@@ -299,15 +288,12 @@
       const platform = navigator.platform || "";
       const isIOS = /iPhone|iPad|iPod/i.test(ua) || (platform === "MacIntel" && navigator.maxTouchPoints > 1);
       const isAndroid = /Android/i.test(ua);
-      const isHuawei = /Huawei|Honor|HUAWEI|HONOR/i.test(ua);
-      const isOppo = /OPPO|PEXM|CPH|P[A-Z]{2,3}M/i.test(ua);
       const show = (id) => {
         const el = document.getElementById(id);
         if (el) el.classList.remove("hidden");
       };
 
       if (isIOS) show("ios-card");
-      else if (isAndroid && (isHuawei || isOppo)) show("store-card");
       else if (isAndroid) show("android-card");
       else show("desktop-card");
 
