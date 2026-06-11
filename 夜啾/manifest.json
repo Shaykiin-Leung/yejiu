@@ -60,7 +60,8 @@
     "plus" : {
         "splashscreen" : {
             "autoclose" : true,
-            "waiting" : true
+            "waiting" : false,
+            "background" : "#000000"
         },
         "popGesture" : "none",
         "runmode" : "normal",
