@@ -1,7 +1,7 @@
 {
   "name": "夜啾 - 世界杯观赛陪伴",
   "short_name": "夜啾",
-  "description": "记录世界杯观赛习惯，陪你熬夜看球，并生成专属球迷人格。",
+  "description": "记录世界杯观赛习惯，生成每日图鉴与专属球迷人格。",
   "start_url": "./index_worldcup.html",
   "scope": "./",
   "display": "standalone",
@@ -13,7 +13,7 @@
       "src": "assets/brand/yejiu-app-avatar-doodle-current.png",
       "sizes": "1024x1024",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }
