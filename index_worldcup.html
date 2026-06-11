@@ -13861,26 +13861,26 @@ function generateDailyStatus(checkins, dateStr) {
                 <!-- 导出部分 -->
                 <div class="rounded-2xl bg-[#121212]/60 border border-white/[0.04] p-3.5 space-y-2">
                     <div class="text-[11px] font-bold text-white flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
                         备份数据 (当前设备 -> 其他设备)
                     </div>
                     <p class="text-[9px] text-zinc-500 leading-normal">生成您的专属数据同步码，复制后在其他浏览器或安装的 APK 中导入即可。</p>
-                    <button onclick="handleSyncExport()" class="w-full py-2.5 rounded-xl bg-zinc-900 border border-white/[0.06] text-zinc-200 text-[10px] font-bold hover:bg-zinc-850 active:scale-95 transition flex items-center justify-center gap-1">
+                    <button onclick="handleSyncExport()" class="w-full py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] text-white text-[10px] font-bold active:scale-95 transition flex items-center justify-center gap-1">
                         <i data-lucide="copy" class="w-3 h-3"></i> 生成并复制同步码
                     </button>
                     <!-- 临时展示区域，防止复制剪贴板失败 -->
-                    <textarea id="sync-export-area" readonly class="hidden w-full h-16 mt-2 p-2 bg-black border border-zinc-900 rounded-lg text-[8px] font-mono text-emerald-400 outline-none resize-none word-break-break-all" placeholder="同步码生成后会在此显示..."></textarea>
+                    <textarea id="sync-export-area" readonly class="hidden w-full h-16 mt-2 p-2 bg-black border border-white/[0.08] rounded-lg text-[8px] font-mono text-zinc-300 outline-none resize-none word-break-break-all" placeholder="同步码生成后会在此显示..."></textarea>
                 </div>
 
                 <!-- 导入部分 -->
                 <div class="rounded-2xl bg-[#121212]/60 border border-white/[0.04] p-3.5 space-y-2">
                     <div class="text-[11px] font-bold text-white flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
                         恢复数据 (导入同步码)
                     </div>
                     <p class="text-[9px] text-zinc-500 leading-normal">粘贴您在其他地方复制的同步码（一长串字符），覆盖当前本地数据。</p>
-                    <textarea id="sync-import-input" class="w-full h-16 p-2 bg-black border border-zinc-900 focus:border-zinc-800 rounded-xl text-[9.5px] text-zinc-300 placeholder-zinc-700 outline-none resize-none word-break-break-all" placeholder="请在此处长按粘贴同步码..."></textarea>
-                    <button onclick="handleSyncImport()" class="w-full py-2.5 rounded-xl bg-[#00e676] text-black text-[10px] font-bold hover:bg-[#00c862] active:scale-95 transition flex items-center justify-center gap-1">
+                    <textarea id="sync-import-input" class="w-full h-16 p-2 bg-black border border-white/[0.08] focus:border-white/[0.2] rounded-xl text-[9.5px] text-zinc-300 placeholder-zinc-700 outline-none resize-none word-break-break-all" placeholder="请在此处长按粘贴同步码..."></textarea>
+                    <button onclick="handleSyncImport()" class="w-full py-2.5 rounded-xl bg-white text-black text-[10px] font-black hover:bg-zinc-200 active:scale-95 transition flex items-center justify-center gap-1 shadow-[0_4px_20px_rgba(255,255,255,0.08)]">
                         <i data-lucide="upload" class="w-3 h-3"></i> 开始恢复数据
                     </button>
                 </div>
