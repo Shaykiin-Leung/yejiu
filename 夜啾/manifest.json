@@ -1,0 +1,106 @@
+{
+    "@platforms" : [ "android" ],
+    "id" : "H5D9B8CC3",
+    "name" : "夜啾",
+    "version" : {
+        "name" : "1.0.0",
+        "code" : "100"
+    },
+    "description" : "2026世界杯球迷健康护航工具",
+    "icons" : {
+        "72" : "icon.png"
+    },
+    "launch_path" : "https://yejiu.vercel.app",
+    "developer" : {
+        "name" : "夜啾团队",
+        "email" : "support@yejiu.app",
+        "url" : ""
+    },
+    "permissions" : {
+        "Cache" : {
+            "description" : "管理应用缓存"
+        },
+        "Console" : {
+            "description" : "跟踪调试输出日志"
+        },
+        "Device" : {
+            "description" : "访问设备信息"
+        },
+        "Downloader" : {
+            "description" : "文件下载管理"
+        },
+        "Events" : {
+            "description" : "应用扩展事件"
+        },
+        "File" : {
+            "description" : "访问本地文件系统"
+        },
+        "Storage" : {
+            "description" : "管理应用本地数据"
+        },
+        "Runtime" : {
+            "description" : "访问运行期环境"
+        },
+        "XMLHttpRequest" : {
+            "description" : "跨域网络访问"
+        },
+        "Webview" : {
+            "description" : "窗口管理"
+        },
+        "NativeUI" : {
+            "description" : "原生UI控件"
+        },
+        "Navigator" : {
+            "description" : "浏览器信息"
+        },
+        "NativeObj" : {
+            "description" : "原生对象"
+        }
+    },
+    "plus" : {
+        "splashscreen" : {
+            "autoclose" : true,
+            "waiting" : true
+        },
+        "popGesture" : "none",
+        "runmode" : "normal",
+        "distribute" : {
+            "google" : {
+                "packagename" : "com.yejiu.app",
+                "keystore" : "",
+                "password" : "",
+                "aliasname" : "",
+                "permissions" : [
+                    "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
+                ]
+            },
+            "orientation" : [ "portrait-primary" ],
+            "icons" : {
+                "android" : {
+                    "mdpi" : "icon.png",
+                    "ldpi" : "icon.png",
+                    "hdpi" : "",
+                    "xhdpi" : "",
+                    "xxhdpi" : ""
+                }
+            },
+            "splashscreen" : {
+                "android" : {
+                    "mdpi" : "",
+                    "ldpi" : "",
+                    "hdpi" : "",
+                    "xhdpi" : "",
+                    "xxhdpi" : ""
+                }
+            },
+            "ios" : {
+                "dSYMs" : false
+            }
+        }
+    },
+    "screenOrientation" : [ "portrait-primary" ]
+}
