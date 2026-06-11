@@ -10,7 +10,7 @@
     "icons" : {
         "72" : "icon.png"
     },
-    "launch_path" : "https://yejiu.vercel.app/index_worldcup.html",
+    "launch_path" : "index.html",
     "developer" : {
         "name" : "夜啾团队",
         "email" : "support@yejiu.app",
@@ -60,8 +60,7 @@
     "plus" : {
         "splashscreen" : {
             "autoclose" : true,
-            "waiting" : false,
-            "background" : "#000000"
+            "waiting" : true
         },
         "popGesture" : "none",
         "runmode" : "normal",
@@ -91,12 +90,14 @@
             },
             "splashscreen" : {
                 "android" : {
-                    "mdpi" : "",
-                    "ldpi" : "",
-                    "hdpi" : "",
-                    "xhdpi" : "",
-                    "xxhdpi" : ""
-                }
+                    "mdpi" : "splash.png",
+                    "ldpi" : "splash.png",
+                    "hdpi" : "splash.png",
+                    "xhdpi" : "splash.png",
+                    "xxhdpi" : "splash.png"
+                },
+                "iosStyle" : "common",
+                "androidStyle" : "default"
             },
             "ios" : {
                 "dSYMs" : false
