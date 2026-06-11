@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
@@ -2251,7 +2251,7 @@ const crossOriginAttr = window.location.protocol === 'file:' ? '' : 'crossorigin
         const FOOTBALL_DATA_SCORE_PATCH_STORAGE = 'football_data_score_patch_v1';
         const FOOTBALL_DATA_LAST_SYNC_STORAGE = 'football_data_last_sync_at';
         const FOOTBALL_DATA_LAST_RESULT_STORAGE = 'football_data_last_sync_result';
-        const FOOTBALL_DATA_SCORE_ENDPOINT = 'https://api.football-data.org/v4/competitions/WC/matches?season=2026';
+        const FOOTBALL_DATA_SCORE_ENDPOINT = '/api/matches'; // 代理接口，Key 由 Vercel 环境变量注入
 
         const TEAM_TLA_MAP = {
             '墨西哥': 'MEX',
@@ -2552,16 +2552,10 @@ const crossOriginAttr = window.location.protocol === 'file:' ? '' : 'crossorigin
         }
 
         async function syncFootballScoresFromApi(manual = false) {
-            const token = (localStorage.getItem(FOOTBALL_DATA_API_KEY_STORAGE) || '').trim();
-            if (!token) {
-                setScoreSyncStatus('还没有保存 API Key。', 'error');
-                showToast('请先保存 API Key');
-                return;
-            }
-            setScoreSyncStatus('正在请求 football-data，比分快照更新中...', 'muted');
+            setScoreSyncStatus('正在同步比分，请稍候...', 'muted');
             try {
                 const response = await fetch(FOOTBALL_DATA_SCORE_ENDPOINT, {
-                    headers: { 'X-Auth-Token': token }
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -2592,8 +2586,6 @@ const crossOriginAttr = window.location.protocol === 'file:' ? '' : 'crossorigin
         }
 
         function maybeAutoSyncFootballScores() {
-            const token = (localStorage.getItem(FOOTBALL_DATA_API_KEY_STORAGE) || '').trim();
-            if (!token) return;
             const lastSync = Date.parse(localStorage.getItem(FOOTBALL_DATA_LAST_SYNC_STORAGE) || '');
             if (Number.isFinite(lastSync) && Date.now() - lastSync < 10 * 60 * 1000) return;
             window.setTimeout(() => syncFootballScoresFromApi(false), 900);
@@ -11643,36 +11635,6 @@ function generateDailyStatus(checkins, dateStr) {
                     <div style="font-size:${compact ? 7 : 7.5}px; color:rgba(255,255,255,0.36); margin-top:5px; font-weight:800; letter-spacing:0.03em; position:relative;">${item.label}</div>
                 </div>
             `).join('');
-            const currentMetrics = getWatchMetrics();
-            const leadingSignal = topPersonaSignals[0] || { label: '等待收录', value: 0 };
-            const personaSnapshotHTML = `
-                <div class="rounded-[22px] border border-white/[0.07] bg-white/[0.025] p-4 text-left relative overflow-hidden">
-                    <div style="position:absolute; top:0; left:18px; right:18px; height:1px; background:${hostRibbon}; opacity:0.46;"></div>
-                    <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <div class="font-mono text-[8px] font-black uppercase tracking-[0.16em] text-zinc-600">CURRENT TRAIL</div>
-                            <div class="mt-1 text-[12px] font-black text-white">你的终局人格正在成型</div>
-                            <div class="mt-1 text-[9px] leading-relaxed text-zinc-600">每日图鉴会沉淀成最终证书，这里先给你看目前最明显的轨迹。</div>
-                        </div>
-                        <div class="shrink-0 inline-flex items-center gap-1 opacity-75">${hostDots}</div>
-                    </div>
-                    <div class="mt-3 grid grid-cols-3 gap-2">
-                        <div class="rounded-2xl border border-white/[0.06] bg-black/25 p-2 text-center">
-                            <div class="text-[16px] font-black text-white leading-none">${dailyJournal.length}</div>
-                            <div class="mt-1 text-[7.5px] font-bold text-zinc-600">已收录天数</div>
-                        </div>
-                        <div class="rounded-2xl border border-white/[0.06] bg-black/25 p-2 text-center">
-                            <div class="truncate text-[11px] font-black text-white leading-none">${currentMetrics.tendency || '随缘看客'}</div>
-                            <div class="mt-1 text-[7.5px] font-bold text-zinc-600">当前倾向</div>
-                        </div>
-                        <div class="rounded-2xl border border-white/[0.06] bg-black/25 p-2 text-center">
-                            <div class="text-[16px] font-black text-white leading-none">${leadingSignal.value}</div>
-                            <div class="mt-1 truncate text-[7.5px] font-bold text-zinc-600">${leadingSignal.label}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
             if (!isUnlocked) {
                 // 锁定状态：神秘悬念界面
                 container.innerHTML = `
@@ -11691,8 +11653,6 @@ function generateDailyStatus(checkins, dateStr) {
                                 在世界杯全部 104 场比赛结束后，你的看球行为轨迹将被综合分析，解锁你专属的<span class="text-zinc-100 font-bold">「终极球迷人格」</span>。
                             </div>
                         </div>
-                        ${personaSnapshotHTML}
-
                         <!-- 进度提示 -->
                         <div class="bg-[#121212]/50 border border-[#222222]/80 rounded-2xl p-4 mx-auto max-w-xs">
                             <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">解锁条件</div>
