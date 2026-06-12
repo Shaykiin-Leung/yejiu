@@ -13457,7 +13457,7 @@ function generateDailyStatus(checkins, dateStr) {
 
             const modal = document.createElement('div');
             modal.id = 'health-share-modal';
-            modal.style.cssText = 'position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:10px 14px; overflow:hidden;';
+            modal.style.cssText = 'position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:10px 14px; overflow-y:auto;';
             modal.innerHTML = `
                 <div style="position:absolute; inset:0; background:rgba(0,0,0,0.92); backdrop-filter:blur(25px); z-index:1;" onclick="document.getElementById('health-share-modal').remove()"></div>
 
@@ -13543,6 +13543,7 @@ function generateDailyStatus(checkins, dateStr) {
                         </div>
                         <div style="height:2px; background:${hostRibbon}; opacity:0.82;"></div>
                     </div>
+                    </div><!-- /poster-scale-wrapper -->
 
                     <button id="health-share-btn" onclick="captureCard('health-poster-card', 'health-share-btn', '夜啾_世界杯护航方案卡')" style="width:100%; padding:12px; background:#ffffff; color:#000000; border:none; border-radius:16px; font-size:13px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:0.05em; font-family:'Outfit','Noto Sans SC',sans-serif; box-shadow:0 4px 20px rgba(255,255,255,0.12); transition:all 0.15s ease;" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
@@ -13568,25 +13569,26 @@ function generateDailyStatus(checkins, dateStr) {
             if (!card) return;
             const wrapper = card.parentElement;
             if (!wrapper) return;
-            
-            // Reset style before measuring
+
+            // 重置先前的缩放
+            card.style.zoom = '';
             card.style.transform = 'none';
+            card.style.transformOrigin = '';
             card.style.margin = '0 auto';
-            wrapper.style.height = 'auto';
-            
-            const wrapperWidth = wrapper.clientWidth;
-            const cardWidth = card.offsetWidth || 360;
-            const cardHeight = card.offsetHeight || 640;
-            
-            if (wrapperWidth < cardWidth) {
-                const scale = wrapperWidth / cardWidth;
-                card.style.transform = `scale(${scale})`;
-                card.style.transformOrigin = 'top center';
-                wrapper.style.height = `${cardHeight * scale}px`;
-            } else {
-                card.style.transform = 'none';
-                wrapper.style.height = 'auto';
-            }
+            wrapper.style.height = '';
+
+            // getBoundingClientRect 强制同步布局，得到可靠的 wrapper 宽度
+            const wrapperWidth = wrapper.getBoundingClientRect().width || wrapper.clientWidth;
+            if (!wrapperWidth) return;
+
+            const cardWidth = 360;
+            if (wrapperWidth >= cardWidth) return; // 幕宽足够，无需缩放
+
+            // 使用 CSS zoom 而非 transform:scale：
+            // zoom 会同时缩放视觉大小和 layout 尺寸，不会产生 overflow/裁剪或错位
+            const scale = wrapperWidth / cardWidth;
+            card.style.zoom = scale.toFixed(5);
+            card.style.margin = '0 auto';
         }
 
         window.addEventListener('resize', () => {
@@ -13621,14 +13623,16 @@ function generateDailyStatus(checkins, dateStr) {
                 console.warn('Cannot hide document.fonts:', fontErr);
             }
 
-            // 备份 transform 样式，防止 html2canvas 渲染偏移/缩放模糊
+            // 备份 transform 和 zoom 样式，防止 html2canvas 渲染偏移/缩放模糊
             const originalTransform = card.style.transform;
             const originalTransformOrigin = card.style.transformOrigin;
+            const originalZoom = card.style.zoom || '';
             const parentEl = card.parentElement;
             const originalParentHeight = parentEl ? parentEl.style.height : '';
 
             // 重置缩放以进行原始尺寸截图
             card.style.transform = 'none';
+            card.style.zoom = '';
             if (parentEl) {
                 parentEl.style.height = 'auto';
             }
@@ -13754,9 +13758,10 @@ function generateDailyStatus(checkins, dateStr) {
                 originalSrcs.forEach(({ img, src }) => { img.src = src; });
 
 
-                // 恢复 transform 样式
+                // 恢复 transform 和 zoom 样式
                 card.style.transform = originalTransform;
                 card.style.transformOrigin = originalTransformOrigin;
+                card.style.zoom = originalZoom;
                 if (parentEl) {
                     parentEl.style.height = originalParentHeight;
                 }
