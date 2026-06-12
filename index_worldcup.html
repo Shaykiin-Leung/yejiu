@@ -5991,9 +5991,11 @@ const CUSTOM_MATCH_ADVICE = {
                                 <span style="display:inline-flex;gap:3px;">${getHostDotsHTML(3, 3, 0.72)}</span>
                                 <span style="font-size:7px;font-weight:700;color:rgba(255,255,255,0.68);letter-spacing:0.12em;text-transform:uppercase;font-family:monospace;">${_archiveLane.label} · POST MATCH</span>
                             </div>
-                            <div style="font-size:26px; font-weight:700; color:#ffffff; letter-spacing:-0.03em; line-height:1.2; margin-bottom:4px;">${diagnosisTag}</div>
-                            ${milestoneTag ? `<div style="display:inline-block; font-size:8px; color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:2px 8px; margin-bottom:4px; letter-spacing:0.05em; font-family:monospace;">${milestoneTag}</div>` : ''}
-                            <div style="font-size:10px; color:rgba(255,255,255,0.38); line-height:1.45; max-width:250px; margin:0 auto;">${diagnosisTitle}</div>
+                            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                                <div style="font-size:26px; font-weight:700; color:#ffffff; letter-spacing:-0.03em; line-height:1.25;">${diagnosisTag}</div>
+                                ${milestoneTag ? `<div style="display:inline-flex; align-items:center; justify-content:center; font-size:8px; color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:2px 8px; letter-spacing:0.05em; font-family:monospace; line-height:1.2;">${milestoneTag}</div>` : ''}
+                                <div style="font-size:10px; color:rgba(255,255,255,0.38); line-height:1.45; max-width:250px; margin:0 auto;">${diagnosisTitle}</div>
+                            </div>
                         </div>
 
                     <!-- ② 诊断金句文案（替代指标条）-->
@@ -11815,7 +11817,7 @@ function generateDailyStatus(checkins, dateStr) {
                                         <div style="font-size:30px; line-height:1; margin:4px 0 8px;">${persona.emoji}</div>
                                         <div style="font-size:24px; font-weight:900; color:#ffffff; line-height:1.15; letter-spacing:-0.02em;">${persona.name}</div>
                                         <div style="font-size:10.5px; color:rgba(255,255,255,0.42); line-height:1.7; max-width:260px; margin-top:9px;">${persona.desc}</div>
-                                        <div class="persona-stamp" style="margin-top:16px; font-size:9px; color:rgba(255,255,255,0.76); font-weight:900; text-transform:uppercase; border:2px solid rgba(255,255,255,0.38); border-radius:5px; padding:4px 10px; font-family:monospace; letter-spacing:0.12em; box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06);">
+                                        <div class="persona-stamp" style="margin-top:16px; font-size:9px; color:rgba(255,255,255,0.76); font-weight:900; text-transform:uppercase; border:2px solid rgba(255,255,255,0.38); border-radius:5px; padding:4px 10px; display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06);">
                                             CERTIFIED
                                         </div>
                                     </div>
@@ -11934,7 +11936,7 @@ function generateDailyStatus(checkins, dateStr) {
                                     ${personaEvidenceHTML}
                                 </details>
 
-                                <div class="persona-stamp" style="position:absolute; right:18px; bottom:20px; font-size:9px; color:rgba(255,255,255,0.62); font-weight:900; text-transform:uppercase; border:2px solid rgba(255,255,255,0.34); border-radius:5px; padding:4px 10px; transform:rotate(-7deg); font-family:monospace; letter-spacing:0.12em; box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06); pointer-events:none;">
+                                <div class="persona-stamp" style="position:absolute; right:18px; bottom:20px; font-size:9px; color:rgba(255,255,255,0.62); font-weight:900; text-transform:uppercase; border:2px solid rgba(255,255,255,0.34); border-radius:5px; padding:4px 10px; transform:rotate(-7deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06); pointer-events:none;">
                                     CERTIFIED
                                 </div>
                             </div>
@@ -13508,7 +13510,7 @@ function generateDailyStatus(checkins, dateStr) {
                                 <div style="position:absolute; inset:-1px; background:radial-gradient(circle at 50% 13%, rgba(255,255,255,0.055) 0, transparent 32%), radial-gradient(circle at 50% 82%, ${accentColor}16 0, transparent 58%); pointer-events:none;"></div>
                                 <div style="position:relative;">${posterSignalPillHTML}</div>
                                 <div style="position:relative; margin-top:8px; font-size:27px; font-weight:900; color:#ffffff; line-height:1.2; letter-spacing:-0.05em; text-shadow:0 14px 34px rgba(0,0,0,0.62);">${posterTitleHTML}</div>
-                                <div style="position:relative; margin-top:6px; font-size:9px; line-height:1.5; color:rgba(255,255,255,0.62); font-weight:700; max-width:266px; max-height:45px; overflow:hidden;">${safe(posterProofShort)}</div>
+                                <div style="position:relative; margin-top:6px; font-size:9px; line-height:1.5; color:rgba(255,255,255,0.62); font-weight:700; max-width:266px; max-height:60px;">${safe(posterProofShort)}</div>
                                 <div style="position:relative; margin-top:8px; width:100%; max-width:270px; padding-top:2px;">
                                     <div style="font-size:10px; color:rgba(255,255,255,0.9); line-height:1.4; font-weight:700;">“${safe(posterQuote)}”</div>
                                     <div style="margin-top:6px; display:inline-flex; align-items:center; gap:6px; color:${accentColor}; font-size:7px; font-family:monospace; font-weight:900; letter-spacing:0.12em; text-transform:uppercase;">
@@ -13532,7 +13534,7 @@ function generateDailyStatus(checkins, dateStr) {
                                     <div>
                                         <div style="font-size:17px; color:#ffffff; font-weight:900; line-height:1.25; letter-spacing:-0.02em; font-family:'Outfit',sans-serif;">${safe(visualCommand)}</div>
                                         <div style="margin-top:4px; font-size:10px; color:rgba(255,255,255,0.82); font-weight:700; line-height:1.3;">${safe(routeFocusTitle)}</div>
-                                        <div style="margin-top:3px; font-size:8px; color:rgba(255,255,255,0.48); line-height:1.4; font-weight:700; max-height:25px; overflow:hidden;">${safe(routeFocusDesc)}</div>
+                                        <div style="margin-top:3px; font-size:8px; color:rgba(255,255,255,0.48); line-height:1.4; font-weight:700; max-height:38px;">${safe(routeFocusDesc)}</div>
                                     </div>
                                     <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:6px;">${routeStepChipsHTML}</div>
                                 </div>
@@ -13619,7 +13621,7 @@ function generateDailyStatus(checkins, dateStr) {
         });
 
 
-                async function captureCard(cardId, btnId, fileName) {
+                        async function captureCard(cardId, btnId, fileName) {
             const card = document.getElementById(cardId);
             const btn  = document.getElementById(btnId);
             if (!card) { showToast('没有找到可生成的海报卡片'); return; }
@@ -13656,7 +13658,7 @@ function generateDailyStatus(checkins, dateStr) {
             const originalNextSibling = card.nextSibling;
             const originalStyle = card.getAttribute('style') || '';
 
-            // 将卡片临时移到 body 根节点，并设为无压缩的 fixed 100% 原始大小布局（360x640）
+            // 将卡片临时移到 body 根节点，并设为无压缩 of fixed 100% 原始大小布局（360x640）
             document.body.appendChild(card);
             card.style.position = 'fixed';
             card.style.left = '-9999px';
@@ -13760,29 +13762,70 @@ function generateDailyStatus(checkins, dateStr) {
                                             }
                                         }
 
-                                        // 2. 彻底清除 mask-image / mix-blend-mode / box-shadow / text-shadow 防止 html2canvas 渲染重叠文字与崩溃
+                                        // 2. 彻底清除 mask-image / mix-blend-mode / box-shadow / text-shadow / letter-spacing (for Chinese)
                                         clonedEl.style.setProperty('box-shadow', 'none', 'important');
                                         clonedEl.style.setProperty('mix-blend-mode', 'normal', 'important');
                                         clonedEl.querySelectorAll('*').forEach(function(el) {
                                             var s = el.getAttribute('style') || '';
                                             var styleChanged = false;
+                                            
+                                            // 2.1 清除 mask-image, mix-blend-mode, box-shadow, text-shadow
                                             if (s.indexOf('mask-image') !== -1) {
                                                 s = s.replace(/-webkit-mask-image\s*:[^;]+;?\s*/g, '');
                                                 s = s.replace(/mask-image\s*:[^;]+;?\s*/g, '');
                                                 styleChanged = true;
                                             }
                                             if (s.indexOf('mix-blend-mode') !== -1) {
-                                                s = s.replace(/-webkit-mix-blend-mode\s*:[^;]+;?\\s*/g, '');
-                                                s = s.replace(/mix-blend-mode\s*:[^;]+;?\\s*/g, '');
+                                                s = s.replace(/-webkit-mix-blend-mode\s*:[^;]+;?\s*/g, '');
+                                                s = s.replace(/mix-blend-mode\s*:[^;]+;?\s*/g, '');
                                                 styleChanged = true;
                                             }
+                                            if (s.indexOf('box-shadow') !== -1) {
+                                                s = s.replace(/box-shadow\s*:[^;]+;?\s*/g, '');
+                                                styleChanged = true;
+                                            }
+                                            if (s.indexOf('text-shadow') !== -1) {
+                                                s = s.replace(/text-shadow\s*:[^;]+;?\s*/g, '');
+                                                styleChanged = true;
+                                            }
+                                            
+                                            // 2.2 检查是否直接或间接包含中文字符，重置 letter-spacing 以防止 html2canvas 字符拆分 Bug
+                                            var text = el.textContent || '';
+                                            var hasChinese = /[\u4e00-\u9fa5]/.test(text);
+                                            var isUppercaseEnglish = /^[A-Z0-9\s·\.-]+$/.test(text.trim());
+                                            var needsNormalSpacing = hasChinese || (text.trim() && !isUppercaseEnglish);
+
+                                            if (needsNormalSpacing) {
+                                                if (s.indexOf('letter-spacing') !== -1) {
+                                                    s = s.replace(/letter-spacing\s*:[^;]+;?\s*/g, '');
+                                                    styleChanged = true;
+                                                }
+                                            }
+
                                             if (styleChanged) {
                                                 el.setAttribute('style', s);
                                             }
+                                            
                                             if (el.style) {
                                                 el.style.setProperty('box-shadow', 'none', 'important');
                                                 el.style.setProperty('text-shadow', 'none', 'important');
                                                 el.style.setProperty('mix-blend-mode', 'normal', 'important');
+                                                
+                                                if (needsNormalSpacing) {
+                                                    el.style.setProperty('letter-spacing', 'normal', 'important');
+                                                }
+                                                if (hasChinese) {
+                                                    // 2.3 强制包含中文的文本使用 Noto Sans SC 优先字栈，防止使用 monospace 带来的间距/渲染 bug
+                                                    var currentFont = el.style.fontFamily || '';
+                                                    if (!currentFont) {
+                                                        try {
+                                                            currentFont = window.getComputedStyle(el).fontFamily || '';
+                                                        } catch(e) {}
+                                                    }
+                                                    if (currentFont.indexOf('monospace') !== -1 || currentFont.indexOf('Outfit') !== -1) {
+                                                        el.style.setProperty('font-family', "'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif", 'important');
+                                                    }
+                                                }
                                             }
                                         });
 
@@ -13808,7 +13851,7 @@ function generateDailyStatus(checkins, dateStr) {
                     })();
                 });
 
-                // 打开预览分享面板，并传入预渲染的 dataUrl
+                // 打开预览分享面板，并传入预渲染 of dataUrl
                 openPosterShareSheet(cardId, fileName, dataUrl);
 
             } catch(err) {
