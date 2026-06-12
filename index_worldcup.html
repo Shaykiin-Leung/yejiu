@@ -5963,7 +5963,7 @@ const CUSTOM_MATCH_ADVICE = {
             return `
                 ${modalHeaderHTML}
 
-                <div id="poster-card" style="background:#080808; border-radius:22px; overflow:hidden; position:relative; font-family:'Noto Sans SC', 'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; line-height:1.4; width:360px; height:640px; box-sizing:border-box; border:1px solid rgba(255,255,255,0.095); box-shadow:0 30px 80px rgba(0,0,0,0.98); display:flex; flex-direction:column; flex-shrink:0;">
+                <div id="poster-card" style="background:#080808; border-radius:22px; overflow:hidden; position:relative; font-family:'Outfit', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; line-height:1.4; width:360px; height:640px; box-sizing:border-box; border:1px solid rgba(255,255,255,0.095); box-shadow:0 30px 80px rgba(0,0,0,0.98); display:flex; flex-direction:column; flex-shrink:0;">
                     <!-- 底纹层：微点阵 + 顶部径向光晕 -->
                     <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px); background-size:20px 20px; pointer-events:none; z-index:0;"></div>
                     <div style="position:absolute; inset:0; background:radial-gradient(circle at 50% 0%, ${_accentGlow}, transparent 65%); pointer-events:none; z-index:0;"></div>
@@ -6147,7 +6147,7 @@ const CUSTOM_MATCH_ADVICE = {
                     </div>
 
                     <div class="poster-scale-wrapper" style="width:100%; overflow:hidden; display:flex; justify-content:center; align-items:center;">
-                        <div id="persona-poster-card" style="background:#080808; border-radius:24px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Noto Sans SC', 'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; line-height:1.4; width:360px; height:640px; border:1px solid rgba(255,255,255,0.12); display:flex; flex-direction:column; flex-shrink:0;">
+                        <div id="persona-poster-card" style="background:#080808; border-radius:24px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Outfit', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; line-height:1.4; width:360px; height:640px; border:1px solid rgba(255,255,255,0.12); display:flex; flex-direction:column; flex-shrink:0;">
                             <!-- 顶部 persona 色扫光线 -->
                             <div style="height:3px; background:${hostRibbon};"></div>
 
@@ -13482,7 +13482,7 @@ function generateDailyStatus(checkins, dateStr) {
                     </div>
 
                     <div class="poster-scale-wrapper" style="width:100%; overflow:hidden; display:flex; justify-content:center; align-items:center;">
-                        <div id="health-poster-card" style="background:linear-gradient(154deg, #070707 0%, #0d0d0d 42%, #050505 100%); border:1px solid rgba(255,255,255,0.13); border-radius:32px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Noto Sans SC', 'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; line-height:1.4; width:360px; height:640px; display:flex; flex-direction:column; box-shadow:0 28px 90px rgba(0,0,0,0.66); flex-shrink:0;">
+                        <div id="health-poster-card" style="background:linear-gradient(154deg, #070707 0%, #0d0d0d 42%, #050505 100%); border:1px solid rgba(255,255,255,0.13); border-radius:32px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Outfit', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; line-height:1.4; width:360px; height:640px; display:flex; flex-direction:column; box-shadow:0 28px 90px rgba(0,0,0,0.66); flex-shrink:0;">
                         <div style="position:absolute; inset:0; background:${hostGlow}; opacity:0.72; pointer-events:none;"></div>
                         <div style="position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px), radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px); background-size:42px 42px, 42px 42px, 17px 17px; pointer-events:none; opacity:0.64;"></div>
                         <div style="position:absolute; left:18px; right:18px; top:0; height:2px; background:${hostRibbon}; opacity:0.85;"></div>
@@ -13502,7 +13502,7 @@ function generateDailyStatus(checkins, dateStr) {
                                 </div>
                             </div>
  
-                            <div style="position:relative; flex:1; min-height:180px; padding:6px 10px; margin-bottom:6px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+                            <div style="position:relative; flex:1; min-height:130px; padding:6px 10px; margin-bottom:6px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
                                 <div style="position:absolute; left:0; right:0; top:0; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);"></div>
                                 <div style="position:absolute; left:0; right:0; bottom:0; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);"></div>
                                 <div style="position:absolute; inset:-1px; background:radial-gradient(circle at 50% 13%, rgba(255,255,255,0.055) 0, transparent 32%), radial-gradient(circle at 50% 82%, ${accentColor}16 0, transparent 58%); pointer-events:none;"></div>
@@ -13536,7 +13536,7 @@ function generateDailyStatus(checkins, dateStr) {
                                     </div>
                                     <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:6px;">${routeStepChipsHTML}</div>
                                 </div>
-                                <div style="margin-top:5px; font-size:7.5px; color:rgba(255,255,255,0.36); line-height:1.3; font-weight:800; text-align:center;">${safe(heroProofLine)} · ${safe(posterSignature)}</div>
+                                <div style="margin-top:8px; font-size:7.5px; color:rgba(255,255,255,0.36); line-height:1.3; font-weight:800; text-align:center;">${safe(heroProofLine)} · ${safe(posterSignature)}</div>
                             </div>
 
                             <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.075); padding-top:7px; margin-top:auto; flex-shrink:0;">
@@ -13732,7 +13732,7 @@ function generateDailyStatus(checkins, dateStr) {
 
                             // 3. 运行 html2canvas
                             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                            const scaleValue = isMobile ? 1.5 : 2;
+                            const scaleValue = Math.min(3, window.devicePixelRatio || 2);
 
                             const c = await html2canvas(card, {
                                 backgroundColor: '#000000',
@@ -13743,6 +13743,12 @@ function generateDailyStatus(checkins, dateStr) {
                                 imageTimeout: 1500,
                                 onclone: function(clonedDoc, clonedEl) {
                                     try {
+                                         // 0. 拷贝原始文档所有的 <link> 和 <style> 标签到克隆文档，保证外部字体和样式表完全一致
+                                         var headStyles = document.querySelectorAll('link[rel="stylesheet"], style');
+                                         headStyles.forEach(function(st) {
+                                             clonedDoc.head.appendChild(st.cloneNode(true));
+                                         });
+
                                         // 1. 强制克隆 DOM 使用真实的 document.fonts，避免渲染时由于系统字 fallback 导致折行排版崩溃
                                         if (originalFonts) {
                                             try {
