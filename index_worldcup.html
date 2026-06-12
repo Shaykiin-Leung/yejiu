@@ -5951,7 +5951,7 @@ const CUSTOM_MATCH_ADVICE = {
             return `
                 ${modalHeaderHTML}
 
-                <div id="poster-card" style="background:#080808; border-radius:22px; overflow:hidden; position:relative; font-family:'Outfit','Noto Sans SC',sans-serif; width:360px; height:640px; box-sizing:border-box; border:1px solid rgba(255,255,255,0.095); box-shadow:0 30px 80px rgba(0,0,0,0.98); display:flex; flex-direction:column; flex-shrink:0;">
+                <div id="poster-card" style="background:#080808; border-radius:22px; overflow:hidden; position:relative; font-family:'Noto Sans SC','Outfit',sans-serif; width:360px; height:640px; box-sizing:border-box; border:1px solid rgba(255,255,255,0.095); box-shadow:0 30px 80px rgba(0,0,0,0.98); display:flex; flex-direction:column; flex-shrink:0;">
                     <!-- 底纹层：微点阵 + 顶部径向光晕 -->
                     <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px); background-size:20px 20px; pointer-events:none; z-index:0;"></div>
                     <div style="position:absolute; inset:0; background:radial-gradient(circle at 50% 0%, ${_accentGlow}, transparent 65%); pointer-events:none; z-index:0;"></div>
@@ -6135,7 +6135,7 @@ const CUSTOM_MATCH_ADVICE = {
                     </div>
 
                     <div class="poster-scale-wrapper" style="width:100%; overflow:hidden; display:flex; justify-content:center; align-items:center;">
-                        <div id="persona-poster-card" style="background:#080808; border-radius:24px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Outfit','Noto Sans SC',sans-serif; width:360px; height:640px; border:1px solid rgba(255,255,255,0.12); display:flex; flex-direction:column; flex-shrink:0;">
+                        <div id="persona-poster-card" style="background:#080808; border-radius:24px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Noto Sans SC','Outfit',sans-serif; width:360px; height:640px; border:1px solid rgba(255,255,255,0.12); display:flex; flex-direction:column; flex-shrink:0;">
                             <!-- 顶部 persona 色扫光线 -->
                             <div style="height:3px; background:${hostRibbon};"></div>
 
@@ -13470,7 +13470,7 @@ function generateDailyStatus(checkins, dateStr) {
                     </div>
 
                     <div class="poster-scale-wrapper" style="width:100%; overflow:hidden; display:flex; justify-content:center; align-items:center;">
-                        <div id="health-poster-card" style="background:linear-gradient(154deg, #070707 0%, #0d0d0d 42%, #050505 100%); border:1px solid rgba(255,255,255,0.13); border-radius:32px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Outfit','Noto Sans SC',sans-serif; width:360px; height:640px; display:flex; flex-direction:column; box-shadow:0 28px 90px rgba(0,0,0,0.66); flex-shrink:0;">
+                        <div id="health-poster-card" style="background:linear-gradient(154deg, #070707 0%, #0d0d0d 42%, #050505 100%); border:1px solid rgba(255,255,255,0.13); border-radius:32px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Noto Sans SC','Outfit',sans-serif; width:360px; height:640px; display:flex; flex-direction:column; box-shadow:0 28px 90px rgba(0,0,0,0.66); flex-shrink:0;">
                         <div style="position:absolute; inset:0; background:${hostGlow}; opacity:0.72; pointer-events:none;"></div>
                         <div style="position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px), radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px); background-size:42px 42px, 42px 42px, 17px 17px; pointer-events:none; opacity:0.64;"></div>
                         <div style="position:absolute; left:18px; right:18px; top:0; height:2px; background:${hostRibbon}; opacity:0.85;"></div>
