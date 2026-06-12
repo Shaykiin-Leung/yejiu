@@ -13998,14 +13998,8 @@ function generateDailyStatus(checkins, dateStr) {
             modal.style.cssText = 'position:fixed; inset:0; z-index:10010; background:rgba(0,0,0,0.78); backdrop-filter:blur(14px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px 18px max(18px, env(safe-area-inset-bottom)); box-sizing:border-box;';
             modal.innerHTML = `
                 <div class="poster-share-preview-slot" style="width:100%; display:flex; align-items:flex-start; justify-content:center; overflow:hidden; border-radius:22px; background:rgba(0,0,0,0.2); box-shadow:0 24px 70px rgba(0,0,0,0.62);"></div>
-                <div style="width:100%; max-width:390px; display:grid; grid-template-columns:repeat(4,1fr); gap:18px 12px; justify-items:center; margin-top:22px;">
-                    ${posterShareButtonHTML(shareId, 'saveImage', '保存到本地', iconSave, 'linear-gradient(135deg, #7c3aed, #4f46e5)')}
-                    ${posterShareButtonHTML(shareId, 'system', '系统分享', iconShare, 'linear-gradient(135deg, #27272a, #111113)')}
-                    ${posterShareButtonHTML(shareId, 'wechat', '微信', '<span style="font-size:20px;line-height:1;">微</span>', 'linear-gradient(135deg, #22c55e, #16a34a)')}
-                    ${posterShareButtonHTML(shareId, 'moments', '朋友圈', '<span style="font-size:20px;line-height:1;">朋</span>', 'linear-gradient(135deg, #14b8a6, #0ea5e9)')}
-                    ${posterShareButtonHTML(shareId, 'qq', 'QQ', '<span style="font-size:20px;line-height:1;">Q</span>', 'linear-gradient(135deg, #38bdf8, #2563eb)')}
-                    ${posterShareButtonHTML(shareId, 'qqzone', 'QQ空间', '<span style="font-size:20px;line-height:1;">★</span>', 'linear-gradient(135deg, #facc15, #f59e0b)')}
-                    ${posterShareButtonHTML(shareId, 'copyText', '复制文案', iconCopy, 'linear-gradient(135deg, #71717a, #27272a)')}
+                <div style="width:100%; max-width:390px; display:flex; justify-content:center; margin-top:22px;">
+                    ${posterShareButtonHTML(shareId, 'saveImage', '保存到本地', iconSave, 'linear-gradient(135deg, #7c3aed, #4f46e5)', true)}
                 </div>
                 <button type="button" onclick="closePosterShareSheet()" style="width:48px; height:48px; border-radius:999px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.08); color:#fff; font-size:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:22px; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">×</button>
             `;
@@ -14054,13 +14048,15 @@ function generateDailyStatus(checkins, dateStr) {
             if (modal) modal.remove();
         }
 
-        function posterShareButtonHTML(shareId, channel, label, iconHtml, gradient) {
+        function posterShareButtonHTML(shareId, channel, label, iconHtml, gradient, wide = false) {
+            const buttonSize = wide ? '72px' : '52px';
+            const labelSize = wide ? '15px' : '11px';
             return `
                 <div style="text-align:center; flex:0 0 auto;">
-                    <button type="button" onclick="sharePosterVia('${shareId}', '${channel}')" style="width:52px; height:52px; border-radius:999px; border:none; background:${gradient}; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,0.4); margin:0 auto; cursor:pointer; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
+                    <button type="button" onclick="sharePosterVia('${shareId}', '${channel}')" style="width:${buttonSize}; height:${buttonSize}; border-radius:999px; border:none; background:${gradient}; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 34px rgba(124,58,237,0.36); margin:0 auto; cursor:pointer; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
                         ${iconHtml}
                     </button>
-                    <div style="font-size:11px; color:rgba(255,255,255,0.85); margin-top:6px; font-weight:700; white-space:nowrap; font-family:'Outfit','Noto Sans SC',sans-serif; letter-spacing:0.04em;">${label}</div>
+                    <div style="font-size:${labelSize}; color:rgba(255,255,255,0.92); margin-top:10px; font-weight:900; white-space:nowrap; font-family:'Outfit','Noto Sans SC',sans-serif; letter-spacing:0.03em;">${label}</div>
                 </div>
             `;
         }
@@ -14098,6 +14094,9 @@ function generateDailyStatus(checkins, dateStr) {
                     }
                 }
                 if (!dataUrl) { showToast('没有找到可保存的海报图片'); return; }
+                _downloadDataUrl(dataUrl, `${fileName || '夜啾_分享海报'}.png`);
+                closePosterShareSheet();
+                return;
                 showToast('正在调起保存...');
                 try {
                     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -14179,11 +14178,24 @@ function generateDailyStatus(checkins, dateStr) {
 
         function _downloadDataUrl(dataUrl, fileName) {
             const a = document.createElement('a');
-            a.href = dataUrl;
+            let objectUrl = '';
+            try {
+                const parts = dataUrl.split(',');
+                const mime = (parts[0].match(/data:([^;]+)/) || [])[1] || 'image/png';
+                const binary = atob(parts[1] || '');
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                objectUrl = URL.createObjectURL(new Blob([bytes], { type: mime }));
+                a.href = objectUrl;
+            } catch (err) {
+                console.warn('Blob download fallback to data url:', err);
+                a.href = dataUrl;
+            }
             a.download = fileName || '夜啾_分享海报.png';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            if (objectUrl) setTimeout(() => URL.revokeObjectURL(objectUrl), 1200);
             showToast('海报已保存');
         }
 
