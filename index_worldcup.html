@@ -5951,7 +5951,7 @@ const CUSTOM_MATCH_ADVICE = {
             return `
                 ${modalHeaderHTML}
 
-                <div id="poster-card" style="background:#080808; border-radius:22px; overflow:hidden; position:relative; font-family:'Outfit','Noto Sans SC',sans-serif; width:100%; aspect-ratio:9/16; box-sizing:border-box; border:1px solid rgba(255,255,255,0.095); box-shadow:0 30px 80px rgba(0,0,0,0.98); display:flex; flex-direction:column;">
+                <div id="poster-card" style="background:#080808; border-radius:22px; overflow:hidden; position:relative; font-family:'Outfit','Noto Sans SC',sans-serif; width:360px; height:640px; box-sizing:border-box; border:1px solid rgba(255,255,255,0.095); box-shadow:0 30px 80px rgba(0,0,0,0.98); display:flex; flex-direction:column; flex-shrink:0;">
                     <!-- 底纹层：微点阵 + 顶部径向光晕 -->
                     <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px); background-size:20px 20px; pointer-events:none; z-index:0;"></div>
                     <div style="position:absolute; inset:0; background:radial-gradient(circle at 50% 0%, ${_accentGlow}, transparent 65%); pointer-events:none; z-index:0;"></div>
@@ -6010,7 +6010,8 @@ const CUSTOM_MATCH_ADVICE = {
                         <span style="font-size:8px;font-weight:900;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;">收录 ${_matchEntries.length}场</span>
                     </div>
 
-                    ${_streakLine ? `<div style="text-align:center; padding:0 16px 8px; font-size:8.5px; color:rgba(255,255,255,0.28); position:relative; z-index:10;">${_streakLine}</div>` : '<div style="flex:1;"></div>'}
+                    ${_streakLine ? `<div style="text-align:center; padding:0 16px 8px; font-size:8.5px; color:rgba(255,255,255,0.28); position:relative; z-index:10;">${_streakLine}</div>` : ''}
+                    <div style="flex:1;"></div>
 
                     <!-- ⑦ 底部 QR + APPROVED -->
                     <div style="border-top:1px solid rgba(255,255,255,0.07); padding:10px 16px 12px; display:flex; align-items:center; justify-content:space-between; position:relative; z-index:10; margin-top:auto;">
@@ -6048,8 +6049,10 @@ const CUSTOM_MATCH_ADVICE = {
             modal.onclick = (e) => { if (e.target === modal) closeBattleReport(); };
 
             modal.innerHTML = `
-                <div class="yejiu-modal-pop" style="width:100%; max-width:350px; margin:auto; display:flex; flex-direction:column; gap:12px; box-sizing:border-box;">
-                    ${reportHTML}
+                <div class="yejiu-modal-pop" style="width:100%; max-width:392px; margin:auto; display:flex; flex-direction:column; gap:12px; box-sizing:border-box;">
+                    <div class="poster-scale-wrapper" style="width:100%; overflow:hidden; display:flex; justify-content:center; align-items:center;">
+                        ${reportHTML}
+                    </div>
                     <!-- 一键生成海报分享按钮 -->
                     <button id="report-share-btn" onclick="captureCard('poster-card', 'report-share-btn', '夜啾_每日图鉴海报')" style="width:100%; padding:14px; background:#ffffff; color:#000000; border:none; border-radius:16px; font-size:13px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:0.05em; font-family:'Outfit','Noto Sans SC',sans-serif;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
@@ -6060,8 +6063,9 @@ const CUSTOM_MATCH_ADVICE = {
             `;
             document.body.appendChild(modal);
             refreshLucideIcons();
+            scalePosterCard('poster-card');
             // 弹窗注入后渲染 QR 码
-            requestAnimationFrame(() => { _renderQRCode('report-qrcode-box', 48); });
+            requestAnimationFrame(() => { _renderQRCode('report-qrcode-box', 40); });
         }
 
         function showToast(msg) {
@@ -6106,12 +6110,12 @@ const CUSTOM_MATCH_ADVICE = {
             modal.style.cssText = 'position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px; overflow:hidden;';
 
             const traitsHTML = persona.traits.map(t => `
-                <div style="margin-bottom:12px;">
-                    <div style="display:flex; justify-content:space-between; font-size:10px; color:#a1a1aa; margin-bottom:5px; font-weight:600;">
+                <div style="margin-bottom:8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:9.5px; color:#a1a1aa; margin-bottom:4px; font-weight:600;">
                         <span>${t.label}</span>
                         <span style="color:#ffffff; font-weight:bold;">${t.val}%</span>
                     </div>
-                    <div style="height:6px; background:#000000; border-radius:3px; overflow:hidden; border: 1px solid #27272a;">
+                    <div style="height:5px; background:#000000; border-radius:3px; overflow:hidden; border: 1px solid #27272a;">
                         <div style="height:100%; background:linear-gradient(90deg, #ffffff 0%, #a1a1aa 100%); width:${t.val}%; border-radius:3px;"></div>
                     </div>
                 </div>
@@ -6121,7 +6125,7 @@ const CUSTOM_MATCH_ADVICE = {
                 <!-- Backdrop sibling to prevent mix-blend-mode isolation -->
                 <div style="position:absolute; inset:0; background:rgba(0,0,0,0.92); backdrop-filter:blur(25px); z-index:1;" onclick="document.getElementById('persona-share-modal').remove()"></div>
 
-                <div class="yejiu-modal-pop" style="width:100%; max-width:350px; margin:auto; display:flex; flex-direction:column; gap:10px; box-sizing:border-box; position:relative; z-index:2;">
+                <div class="yejiu-modal-pop" style="width:100%; max-width:392px; margin:auto; display:flex; flex-direction:column; gap:10px; box-sizing:border-box; position:relative; z-index:2;">
                     <!-- 顶部标题栏 -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; padding: 0 4px;">
                         <div style="font-size:13px; font-weight:800; color:#ffffff; display:flex; align-items:center; gap:8px; letter-spacing:0.04em;">
@@ -6130,102 +6134,106 @@ const CUSTOM_MATCH_ADVICE = {
                         </div>
                     </div>
 
-                    <div id="persona-poster-card" style="background:#080808; border-radius:24px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Outfit','Noto Sans SC',sans-serif; width:100%; border:1px solid rgba(255,255,255,0.12);">
-                        <!-- 顶部 persona 色扫光线 -->
-                        <div style="height:3px; background:${hostRibbon};"></div>
+                    <div class="poster-scale-wrapper" style="width:100%; overflow:hidden; display:flex; justify-content:center; align-items:center;">
+                        <div id="persona-poster-card" style="background:#080808; border-radius:24px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Outfit','Noto Sans SC',sans-serif; width:360px; height:640px; border:1px solid rgba(255,255,255,0.12); display:flex; flex-direction:column; flex-shrink:0;">
+                            <!-- 顶部 persona 色扫光线 -->
+                            <div style="height:3px; background:${hostRibbon};"></div>
 
-                        <!-- 背景效果 -->
-                        <div style="position:absolute; inset:0; background:radial-gradient(ellipse at 50% 15%, ${persona.color}0b, transparent 60%); pointer-events:none;"></div>
-                        <div style="position:absolute; inset:0; background:${hostGlow}; pointer-events:none;"></div>
-                        <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.022) 1px, transparent 1px); background-size:18px 18px; pointer-events:none;"></div>
+                            <!-- 背景效果 -->
+                            <div style="position:absolute; inset:0; background:radial-gradient(ellipse at 50% 15%, ${persona.color}0b, transparent 60%); pointer-events:none;"></div>
+                            <div style="position:absolute; inset:0; background:${hostGlow}; pointer-events:none;"></div>
+                            <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.022) 1px, transparent 1px); background-size:18px 18px; pointer-events:none;"></div>
 
-                        <div style="padding:18px 18px 14px; position:relative;">
-                            <!-- 顶栏：标题 + 日期 -->
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
-                                <div>
-                                    <div style="font-size:9px; font-weight:900; color:rgba(255,255,255,0.65); letter-spacing:0.12em; text-transform:uppercase; font-family:monospace;">2026 FIFA WORLD CUP</div>
-                                    <div style="font-size:7px; color:rgba(255,255,255,0.22); letter-spacing:0.08em; margin-top:2px; text-transform:uppercase; font-family:monospace;">NIGHTBIRD · FAN PERSONA REPORT</div>
-                                </div>
-                                <div style="font-size:8px; font-weight:700; color:rgba(255,255,255,0.74); letter-spacing:0.06em; font-family:monospace; margin-top:1px;">${new Date().toISOString().substring(0,10).replace(/-/g,'.')}</div>
-                            </div>
-
-                            <!-- 吉祥物主角区域 -->
-                            <div style="text-align:center; margin-bottom:6px;">
-                                <div style="width:180px; height:180px; margin:0 auto; position:relative;">
-                                    <div style="position:absolute; inset:0; background:radial-gradient(circle at center, ${persona.color}12, transparent 65%); pointer-events:none;"></div>
-                                    <img src="${assetUrl(persona.imgName)}" ${crossOriginAttr}
-                                         onerror="this.onerror=null; handleImageLoadError(this);"
-                                         style="width:100%; height:100%; object-fit:contain; display:block;
-                                                mix-blend-mode:screen;
-                                                -webkit-mask-image:radial-gradient(circle at center, black 50%, transparent 72%);
-                                                mask-image:radial-gradient(circle at center, black 50%, transparent 72%);">
-                                </div>
-                            </div>
-
-                            <!-- ENDGAME 标签 + Emoji -->
-                            <div style="text-align:center; margin-bottom:8px;">
-                                <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); border-radius:999px; padding:3px 12px; margin-bottom:8px;">
-                                    <span style="display:inline-flex; align-items:center; gap:3px; flex-shrink:0;">${hostDots}</span>
-                                    <span style="font-size:7px; font-weight:900; color:#ffffff; letter-spacing:0.14em; text-transform:uppercase; font-family:monospace;">ENDGAME PERSONA</span>
-                                </div>
-                                <div style="font-size:28px; line-height:1;">${persona.emoji}</div>
-                            </div>
-
-                            <!-- 人格名 - 主视觉 -->
-                            <div style="text-align:center; margin-bottom:8px;">
-                                <div style="font-size:25px; font-weight:900; color:#ffffff; letter-spacing:-0.03em; line-height:1.1;">${persona.name}</div>
-                            </div>
-
-                            <!-- 描述 -->
-                            <div style="text-align:center; margin-bottom:14px;">
-                                <div style="font-size:10px; color:rgba(255,255,255,0.38); line-height:1.7; max-width:250px; margin:0 auto;">${persona.desc}</div>
-                            </div>
-
-                            <!-- 本届旅程叙事板块 -->
-                            <div style="border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:11px 14px; margin-bottom:14px; background:rgba(255,255,255,0.018); text-align:center; position:relative; overflow:hidden;">
-                                <div style="position:absolute; top:0; left:18px; right:18px; height:1px; background:${hostRibbon}; opacity:0.68;"></div>
-                                <div style="font-size:8px; color:rgba(255,255,255,0.62); font-weight:900; letter-spacing:0.1em; font-family:monospace; text-transform:uppercase; margin-bottom:6px;">你的 2026 世界杯旅程</div>
-                                <div style="font-size:11.5px; color:rgba(255,255,255,0.55); line-height:1.8; font-weight:500;">
-                                    陪伴了 <span style="color:#ffffff; font-weight:900; font-size:14px;">${subbedCount}</span> 场精彩赛事
-                                    &nbsp;·&nbsp; 熬夜 <span style="color:#ffffff; font-weight:900; font-size:14px;">${dangerCount}</span> 天
-                                    &nbsp;·&nbsp; 恢复压力 <span style="color:#ffffff; font-weight:900; font-size:14px;">${sleepDebt % 1 === 0 ? sleepDebt : sleepDebt.toFixed(1)}h</span>
-                                </div>
-                            </div>
-
-                            <!-- 属性数字格 -->
-                            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px;">
-                                ${persona.traits.map(t => `
-                                    <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:11px 4px; text-align:center; position:relative; overflow:hidden;">
-                                        <div style="position:absolute; top:0; left:9px; right:9px; height:1px; background:${hostRibbon}; opacity:0.42;"></div>
-                                        <div style="position:absolute; bottom:0; left:0; right:0; height:${t.val}%; background:rgba(255,255,255,0.026);"></div>
-                                        <div style="font-size:19px; font-weight:900; color:#ffffff; line-height:1; position:relative;">${t.val}</div>
-                                        <div style="font-size:7px; color:rgba(255,255,255,0.3); margin-top:4px; font-weight:700; letter-spacing:0.04em; position:relative; line-height:1.3;">${t.label}</div>
+                            <div style="padding:18px 18px 14px; position:relative; flex:1; display:flex; flex-direction:column; justify-content:space-between; min-height:0;">
+                                <!-- 顶栏：标题 + 日期 -->
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                                    <div>
+                                        <div style="font-size:9px; font-weight:900; color:rgba(255,255,255,0.65); letter-spacing:0.12em; text-transform:uppercase; font-family:monospace;">2026 FIFA WORLD CUP</div>
+                                        <div style="font-size:7px; color:rgba(255,255,255,0.22); letter-spacing:0.08em; margin-top:2px; text-transform:uppercase; font-family:monospace;">NIGHTBIRD · FAN PERSONA REPORT</div>
                                     </div>
-                                `).join('')}
-                            </div>
+                                    <div style="font-size:8px; font-weight:700; color:rgba(255,255,255,0.74); letter-spacing:0.06em; font-family:monospace; margin-top:1px;">${new Date().toISOString().substring(0,10).replace(/-/g,'.')}</div>
+                                </div>
 
-                            <!-- 底部：二维码 + 品牌 + APPROVED 印章 -->
-                            <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.07); padding-top:12px;">
-                                <div style="display:flex; flex-direction:column; gap:3px; align-items:center;">
-                                    <div id="persona-qrcode-box" style="width:44px; height:44px; background:#fff; border-radius:5px; overflow:hidden; display:flex; align-items:center; justify-content:center;"></div>
-                                    <div style="font-size:7px; color:rgba(255,255,255,0.18); font-family:monospace;">扫码分享</div>
-                                </div>
-                                <div style="text-align:center; flex:1;">
-                                    <div style="font-size:7.5px; color:rgba(255,255,255,0.18); font-family:monospace; letter-spacing:0.06em;">夜啾 NIGHTBIRD · 2026</div>
-                                </div>
-                                <div style="display:flex; align-items:center; justify-content:flex-end;">
-                                    <div style="font-size:10px; color:rgba(255,255,255,0.66); font-weight:900; text-transform:uppercase;
-                                                border:2px solid rgba(255,255,255,0.42); border-radius:5px; padding:4px 9px;
-                                                transform:rotate(-8deg); font-family:monospace; letter-spacing:0.1em;
-                                                box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06);">
-                                        APPROVED
+                                <!-- 吉样物主角区域 -->
+                                <div style="text-align:center; margin-bottom:2px;">
+                                    <div style="width:160px; height:160px; margin:0 auto; position:relative;">
+                                        <div style="position:absolute; inset:0; background:radial-gradient(circle at center, ${persona.color}12, transparent 65%); pointer-events:none;"></div>
+                                        <img src="${assetUrl(persona.imgName)}" ${crossOriginAttr}
+                                             onerror="this.onerror=null; handleImageLoadError(this);"
+                                             style="width:100%; height:100%; object-fit:contain; display:block;
+                                                    mix-blend-mode:screen;
+                                                    -webkit-mask-image:radial-gradient(circle at center, black 50%, transparent 72%);
+                                                    mask-image:radial-gradient(circle at center, black 50%, transparent 72%);">
                                     </div>
                                 </div>
+
+                                <!-- ENDGAME 标签 + Emoji -->
+                                <div style="text-align:center; margin-bottom:2px;">
+                                    <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); border-radius:999px; padding:3px 12px; margin-bottom:4px;">
+                                        <span style="display:inline-flex; align-items:center; gap:3px; flex-shrink:0;">${hostDots}</span>
+                                        <span style="font-size:7px; font-weight:900; color:#ffffff; letter-spacing:0.14em; text-transform:uppercase; font-family:monospace;">ENDGAME PERSONA</span>
+                                    </div>
+                                    <div style="font-size:24px; line-height:1;">${persona.emoji}</div>
+                                </div>
+
+                                <!-- 人格名 - 主视觉 -->
+                                <div style="text-align:center; margin-bottom:2px;">
+                                    <div style="font-size:24px; font-weight:900; color:#ffffff; letter-spacing:-0.03em; line-height:1.1;">${persona.name}</div>
+                                </div>
+
+                                <!-- 描述 -->
+                                <div style="text-align:center; margin-bottom:6px;">
+                                    <div style="font-size:9.5px; color:rgba(255,255,255,0.38); line-height:1.6; max-width:250px; margin:0 auto;">${persona.desc}</div>
+                                </div>
+
+                                <!-- 本届旅程叙事板块 -->
+                                <div style="border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:10px 14px; margin-bottom:8px; background:rgba(255,255,255,0.018); text-align:center; position:relative; overflow:hidden;">
+                                    <div style="position:absolute; top:0; left:18px; right:18px; height:1px; background:${hostRibbon}; opacity:0.68;"></div>
+                                    <div style="font-size:8px; color:rgba(255,255,255,0.62); font-weight:900; letter-spacing:0.1em; font-family:monospace; text-transform:uppercase; margin-bottom:4px;">你的 2026 世界杯旅程</div>
+                                    <div style="font-size:11px; color:rgba(255,255,255,0.55); line-height:1.8; font-weight:500;">
+                                        陪伴了 <span style="color:#ffffff; font-weight:900; font-size:13px;">${subbedCount}</span> 场精彩赛事
+                                        &nbsp;·&nbsp; 熬夜 <span style="color:#ffffff; font-weight:900; font-size:13px;">${dangerCount}</span> 天
+                                        &nbsp;·&nbsp; 恢复压力 <span style="color:#ffffff; font-weight:900; font-size:13px;">${sleepDebt % 1 === 0 ? sleepDebt : sleepDebt.toFixed(1)}h</span>
+                                    </div>
+                                </div>
+
+                                <!-- 属性数字格 -->
+                                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px;">
+                                    ${persona.traits.map(t => `
+                                        <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:9px 4px; text-align:center; position:relative; overflow:hidden;">
+                                            <div style="position:absolute; top:0; left:9px; right:9px; height:1px; background:${hostRibbon}; opacity:0.42;"></div>
+                                            <div style="position:absolute; bottom:0; left:0; right:0; height:${t.val}%; background:rgba(255,255,255,0.026);"></div>
+                                            <div style="font-size:17px; font-weight:900; color:#ffffff; line-height:1; position:relative;">${t.val}</div>
+                                            <div style="font-size:7px; color:rgba(255,255,255,0.3); margin-top:3px; font-weight:700; letter-spacing:0.04em; position:relative; line-height:1.3;">${t.label}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+
+                                <div style="flex:1;"></div>
+
+                                <!-- 底部：二维码 + 品牌 + APPROVED 印章 -->
+                                <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.07); padding-top:10px;">
+                                    <div style="display:flex; flex-direction:column; gap:2px; align-items:center;">
+                                        <div id="persona-qrcode-box" style="width:40px; height:40px; background:#fff; border-radius:5px; overflow:hidden; display:flex; align-items:center; justify-content:center;"></div>
+                                        <div style="font-size:6px; color:rgba(255,255,255,0.18); margin-top:2px;">扫码分享</div>
+                                    </div>
+                                    <div style="text-align:center; flex:1;">
+                                        <div style="font-size:7.5px; color:rgba(255,255,255,0.18); font-family:monospace; letter-spacing:0.06em;">夜啾 NIGHTBIRD · 2026</div>
+                                    </div>
+                                    <div style="display:flex; align-items:center; justify-content:flex-end;">
+                                        <div style="font-size:8px; color:rgba(255,255,255,0.66); font-weight:900; text-transform:uppercase;
+                                                    border:1.5px solid rgba(255,255,255,0.42); border-radius:5px; padding:3px 7px;
+                                                    transform:rotate(-8deg); font-family:monospace; letter-spacing:0.1em;
+                                                    box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06);">
+                                            APPROVED
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- 底部 persona 色扫光线 -->
+                            <div style="height:2px; background:${hostRibbon}; opacity:0.86;"></div>
                         </div>
-
-                        <!-- 底部 persona 色扫光线 -->
-                        <div style="height:2px; background:${hostRibbon}; opacity:0.86;"></div>
                     </div>
 
                     <!-- 一键生成海报按钮 -->
@@ -6238,11 +6246,11 @@ const CUSTOM_MATCH_ADVICE = {
             `;
             document.body.appendChild(modal);
             refreshLucideIcons();
+            scalePosterCard('persona-poster-card');
 
             // 弹窗注入 DOM 后，立刻渲染两个 QR 码
             requestAnimationFrame(() => {
-                _renderQRCode('report-qrcode-box', 48);
-                _renderQRCode('persona-qrcode-box', 44);
+                _renderQRCode('persona-qrcode-box', 40);
             });
         }
 
@@ -13453,7 +13461,7 @@ function generateDailyStatus(checkins, dateStr) {
             modal.innerHTML = `
                 <div style="position:absolute; inset:0; background:rgba(0,0,0,0.92); backdrop-filter:blur(25px); z-index:1;" onclick="document.getElementById('health-share-modal').remove()"></div>
 
-                <div class="yejiu-modal-pop" style="width:${modalWidth}px; max-width:calc(100vw - 28px); display:flex; flex-direction:column; gap:8px; box-sizing:border-box; position:relative; z-index:2;">
+                <div class="yejiu-modal-pop" style="width:100%; max-width:392px; display:flex; flex-direction:column; gap:8px; box-sizing:border-box; position:relative; z-index:2;">
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:0 2px;">
                         <div style="font-size:13px; font-weight:900; color:#ffffff; display:flex; align-items:center; gap:8px; letter-spacing:0.04em;">
                             <svg onclick="document.getElementById('health-share-modal').remove()" style="cursor:pointer; color:#a1a1aa;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -13461,7 +13469,8 @@ function generateDailyStatus(checkins, dateStr) {
                         </div>
                     </div>
 
-                    <div id="health-poster-card" style="background:linear-gradient(154deg, #070707 0%, #0d0d0d 42%, #050505 100%); border:1px solid rgba(255,255,255,0.13); border-radius:32px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Outfit','Noto Sans SC',sans-serif; width:100%; aspect-ratio:9/16; display:flex; flex-direction:column; box-shadow:0 28px 90px rgba(0,0,0,0.66);">
+                    <div class="poster-scale-wrapper" style="width:100%; overflow:hidden; display:flex; justify-content:center; align-items:center;">
+                        <div id="health-poster-card" style="background:linear-gradient(154deg, #070707 0%, #0d0d0d 42%, #050505 100%); border:1px solid rgba(255,255,255,0.13); border-radius:32px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Outfit','Noto Sans SC',sans-serif; width:360px; height:640px; display:flex; flex-direction:column; box-shadow:0 28px 90px rgba(0,0,0,0.66); flex-shrink:0;">
                         <div style="position:absolute; inset:0; background:${hostGlow}; opacity:0.72; pointer-events:none;"></div>
                         <div style="position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px), radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px); background-size:42px 42px, 42px 42px, 17px 17px; pointer-events:none; opacity:0.64;"></div>
                         <div style="position:absolute; left:18px; right:18px; top:0; height:2px; background:${hostRibbon}; opacity:0.85;"></div>
@@ -13469,8 +13478,8 @@ function generateDailyStatus(checkins, dateStr) {
                         <div style="position:absolute; left:-58px; top:92px; width:160px; height:160px; border-radius:999px; background:radial-gradient(circle, ${hostAccents.red}12 0, transparent 68%); pointer-events:none;"></div>
                         <div style="position:absolute; right:-62px; top:168px; width:214px; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transform:rotate(-35deg); pointer-events:none;"></div>
 
-                        <div style="padding:17px 18px 15px; position:relative; flex:1; display:flex; flex-direction:column; min-height:0;">
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px;">
+                        <div style="padding:17px 18px 15px; position:relative; flex:1; display:flex; flex-direction:column; justify-content:space-between; min-height:0;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:8px; flex-shrink:0;">
                                 <div>
                                     <div style="font-size:9px; font-weight:900; color:rgba(255,255,255,0.66); letter-spacing:0.13em; text-transform:uppercase; font-family:monospace;">2026 FIFA WORLD CUP</div>
                                     <div style="font-size:7px; color:rgba(255,255,255,0.25); letter-spacing:0.1em; margin-top:2px; text-transform:uppercase; font-family:monospace;">YEJIU · WATCH HEALTH PASS</div>
@@ -13481,46 +13490,46 @@ function generateDailyStatus(checkins, dateStr) {
                                 </div>
                             </div>
 
-                            <div style="position:relative; min-height:214px; padding:17px 10px 14px; margin-bottom:13px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+                            <div style="position:relative; flex:1; min-height:180px; padding:10px 10px; margin-bottom:8px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
                                 <div style="position:absolute; left:0; right:0; top:0; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);"></div>
                                 <div style="position:absolute; left:0; right:0; bottom:0; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);"></div>
                                 <div style="position:absolute; inset:-1px; background:radial-gradient(circle at 50% 13%, rgba(255,255,255,0.055) 0, transparent 32%), radial-gradient(circle at 50% 82%, ${accentColor}16 0, transparent 58%); pointer-events:none;"></div>
                                 <div style="position:relative;">${posterSignalPillHTML}</div>
-                                <div style="position:relative; margin-top:14px; font-size:34px; font-weight:900; color:#ffffff; line-height:1.01; letter-spacing:-0.05em; text-shadow:0 14px 34px rgba(0,0,0,0.62);">${posterTitleHTML}</div>
-                                <div style="position:relative; margin-top:11px; font-size:9.6px; line-height:1.55; color:rgba(255,255,255,0.62); font-weight:900; max-width:266px; max-height:45px; overflow:hidden;">${safe(posterProofShort)}</div>
-                                <div style="position:relative; margin-top:13px; width:100%; max-width:270px; padding-top:2px;">
-                                    <div style="font-size:10.5px; color:rgba(255,255,255,0.9); line-height:1.44; font-weight:900;">“${safe(posterQuote)}”</div>
-                                    <div style="margin-top:9px; display:inline-flex; align-items:center; gap:6px; color:${accentColor}; font-size:7.5px; font-family:monospace; font-weight:900; letter-spacing:0.12em; text-transform:uppercase;">
-                                        <span style="width:22px; height:1px; border-radius:999px; background:${accentColor}; opacity:0.72;"></span>
+                                <div style="position:relative; margin-top:10px; font-size:30px; font-weight:900; color:#ffffff; line-height:1.05; letter-spacing:-0.05em; text-shadow:0 14px 34px rgba(0,0,0,0.62);">${posterTitleHTML}</div>
+                                <div style="position:relative; margin-top:8px; font-size:9px; line-height:1.5; color:rgba(255,255,255,0.62); font-weight:900; max-width:266px; max-height:45px; overflow:hidden;">${safe(posterProofShort)}</div>
+                                <div style="position:relative; margin-top:10px; width:100%; max-width:270px; padding-top:2px;">
+                                    <div style="font-size:10px; color:rgba(255,255,255,0.9); line-height:1.4; font-weight:900;">“${safe(posterQuote)}”</div>
+                                    <div style="margin-top:7px; display:inline-flex; align-items:center; gap:6px; color:${accentColor}; font-size:7px; font-family:monospace; font-weight:900; letter-spacing:0.12em; text-transform:uppercase;">
+                                        <span style="width:20px; height:1px; border-radius:999px; background:${accentColor}; opacity:0.72;"></span>
                                         ${safe(routeCode)}
-                                        <span style="width:22px; height:1px; border-radius:999px; background:${accentColor}; opacity:0.72;"></span>
+                                        <span style="width:20px; height:1px; border-radius:999px; background:${accentColor}; opacity:0.72;"></span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:0 2px 14px; padding:0 2px 13px; border-bottom:1px solid rgba(255,255,255,0.075); text-align:center;">
+                            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:0 2px 10px; padding:0 2px 9px; border-bottom:1px solid rgba(255,255,255,0.075); text-align:center; flex-shrink:0;">
                                 ${permitStatsHTML}
                             </div>
 
-                            <div style="padding:0 2px 10px; margin-bottom:10px; flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center;">
-                                <div style="border:1px solid rgba(255,255,255,0.082); background:linear-gradient(145deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)); border-radius:22px; padding:13px 13px 12px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.035);">
-                                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
+                            <div style="padding:0 2px 8px; margin-bottom:6px; flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center;">
+                                <div style="border:1px solid rgba(255,255,255,0.082); background:linear-gradient(145deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)); border-radius:22px; padding:11px 12px 10px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.035);">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
                                         <div style="font-size:8px; font-weight:900; color:rgba(255,255,255,0.34); letter-spacing:0.14em; text-transform:uppercase; font-family:monospace;">TONIGHT ROUTE</div>
                                         <div style="font-size:7px; color:rgba(255,255,255,0.34); font-family:monospace; white-space:nowrap;">RECOVERY ${safe(guideValue)}</div>
                                     </div>
                                     <div>
-                                        <div style="font-size:21px; color:#ffffff; font-weight:900; line-height:1; letter-spacing:-0.02em;">${safe(visualCommand)}</div>
-                                        <div style="margin-top:8px; font-size:11px; color:rgba(255,255,255,0.82); font-weight:900; line-height:1.35;">${safe(routeFocusTitle)}</div>
-                                        <div style="margin-top:5px; font-size:8.4px; color:rgba(255,255,255,0.48); line-height:1.45; font-weight:800; max-height:25px; overflow:hidden;">${safe(routeFocusDesc)}</div>
+                                        <div style="font-size:19px; color:#ffffff; font-weight:900; line-height:1; letter-spacing:-0.02em;">${safe(visualCommand)}</div>
+                                        <div style="margin-top:6px; font-size:10.5px; color:rgba(255,255,255,0.82); font-weight:900; line-height:1.3;">${safe(routeFocusTitle)}</div>
+                                        <div style="margin-top:4px; font-size:8px; color:rgba(255,255,255,0.48); line-height:1.4; font-weight:800; max-height:25px; overflow:hidden;">${safe(routeFocusDesc)}</div>
                                     </div>
-                                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">${routeStepChipsHTML}</div>
+                                    <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:8px;">${routeStepChipsHTML}</div>
                                 </div>
-                                <div style="margin-top:9px; font-size:8px; color:rgba(255,255,255,0.36); line-height:1.35; font-weight:800; text-align:center;">${safe(heroProofLine)} · ${safe(posterSignature)}</div>
+                                <div style="margin-top:7px; font-size:7.5px; color:rgba(255,255,255,0.36); line-height:1.3; font-weight:800; text-align:center;">${safe(heroProofLine)} · ${safe(posterSignature)}</div>
                             </div>
 
-                            <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.075); padding-top:11px; margin-top:auto;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.075); padding-top:9px; margin-top:auto; flex-shrink:0;">
                                 <div style="display:flex; align-items:center; gap:9px;">
-                                    <div id="health-qrcode-box" style="width:42px; height:42px; background:#fff; border-radius:6px; overflow:hidden; display:flex; align-items:center; justify-content:center;"></div>
+                                    <div id="health-qrcode-box" style="width:40px; height:40px; background:#fff; border-radius:5px; overflow:hidden; display:flex; align-items:center; justify-content:center;"></div>
                                     <div>
                                         <div style="font-size:7.5px; color:rgba(255,255,255,0.23); font-family:monospace; letter-spacing:0.07em;">夜啾 NIGHTBIRD · 2026</div>
                                         <div style="font-size:8px; color:rgba(255,255,255,0.52); line-height:1.45; margin-top:4px; font-weight:900;">${safe(shareCTA)}</div>
@@ -13543,15 +13552,48 @@ function generateDailyStatus(checkins, dateStr) {
             `;
             document.body.appendChild(modal);
             refreshLucideIcons();
+            scalePosterCard('health-poster-card');
 
             requestAnimationFrame(() => {
-                _renderQRCode('health-qrcode-box', 42);
+                _renderQRCode('health-qrcode-box', 40);
             });
         }
 
         function showHealthShareModal() {
             return showHealthGuideShareModalV2();
         }
+
+        function scalePosterCard(cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            const wrapper = card.parentElement;
+            if (!wrapper) return;
+            
+            // Reset style before measuring
+            card.style.transform = 'none';
+            card.style.margin = '0 auto';
+            wrapper.style.height = 'auto';
+            
+            const wrapperWidth = wrapper.clientWidth;
+            const cardWidth = card.offsetWidth || 360;
+            const cardHeight = card.offsetHeight || 640;
+            
+            if (wrapperWidth < cardWidth) {
+                const scale = wrapperWidth / cardWidth;
+                card.style.transform = `scale(${scale})`;
+                card.style.transformOrigin = 'top center';
+                wrapper.style.height = `${cardHeight * scale}px`;
+            } else {
+                card.style.transform = 'none';
+                wrapper.style.height = 'auto';
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            scalePosterCard('poster-card');
+            scalePosterCard('persona-poster-card');
+            scalePosterCard('health-poster-card');
+        });
 
 
         async function captureCard(cardId, btnId, fileName) {
@@ -13579,29 +13621,19 @@ function generateDailyStatus(checkins, dateStr) {
                 console.warn('Cannot hide document.fonts:', fontErr);
             }
 
-            // 临时禁用外部样式表，防止 html2canvas 内部样式表下载挂起
-            const disabledSheets = [];
-            try {
-                Array.from(document.querySelectorAll('link[rel="stylesheet"]')).forEach(link => {
-                    if (link.href && (link.href.includes('fonts.googleapis.com') || link.href.includes('fonts.gstatic.com'))) {
-                        disabledSheets.push(link);
-                        link.disabled = true;
-                    }
-                });
-            } catch(sheetErr) {
-                console.warn('Error disabling stylesheets:', sheetErr);
+            // 备份 transform 样式，防止 html2canvas 渲染偏移/缩放模糊
+            const originalTransform = card.style.transform;
+            const originalTransformOrigin = card.style.transformOrigin;
+            const parentEl = card.parentElement;
+            const originalParentHeight = parentEl ? parentEl.style.height : '';
+
+            // 重置缩放以进行原始尺寸截图
+            card.style.transform = 'none';
+            if (parentEl) {
+                parentEl.style.height = 'auto';
             }
 
-            // 临时添加全局样式以剥离所有 mask-image 和 -webkit-mask-image，防止 html2canvas 内部 createPattern 崩溃
-            const maskStyle = document.createElement('style');
-            maskStyle.id = 'html2canvas-mask-override';
-            maskStyle.innerHTML = `
-                * {
-                    -webkit-mask-image: none !important;
-                    mask-image: none !important;
-                }
-            `;
-            document.head.appendChild(maskStyle);
+            // (mask-image 剥离已移至 html2canvas onclone 回调中处理，避免修改真实 DOM)
 
             const originalSrcs = [];
             const imgs = Array.from(card.querySelectorAll('img'));
@@ -13676,7 +13708,29 @@ function generateDailyStatus(checkins, dateStr) {
                                 useCORS: true,
                                 allowTaint: true,
                                 logging: false,
-                                imageTimeout: 1500
+                                imageTimeout: 1500,
+                                onclone: function(clonedDoc, clonedEl) {
+                                    try {
+                                        // 在克隆文档中剥离 mask-image，防止 createPattern 宽高为0崩溃
+                                        // html2canvas 渲染的是克隆DOM，必须在此处处理
+                                        clonedEl.querySelectorAll('[style]').forEach(function(el) {
+                                            var s = el.getAttribute('style') || '';
+                                            if (s.indexOf('mask-image') !== -1) {
+                                                s = s.replace(/-webkit-mask-image\s*:[^;]+;?\s*/g, '');
+                                                s = s.replace(/mask-image\s*:[^;]+;?\s*/g, '');
+                                                el.setAttribute('style', s);
+                                            }
+                                        });
+                                        // 修复0尺寸canvas（如QR码渲染失败），防止额外createPattern崩溃
+                                        clonedEl.querySelectorAll('canvas').forEach(function(cv) {
+                                            if (!cv.width || !cv.height) {
+                                                cv.style.display = 'none';
+                                            }
+                                        });
+                                    } catch(cloneErr) {
+                                        console.warn('onclone cleanup error:', cloneErr);
+                                    }
+                                }
                             });
                             
                             const dUrl = c.toDataURL('image/png');
@@ -13699,11 +13753,13 @@ function generateDailyStatus(checkins, dateStr) {
                 // 恢复图片 src
                 originalSrcs.forEach(({ img, src }) => { img.src = src; });
 
-                // 移除临时样式
-                if (maskStyle) maskStyle.remove();
 
-                // 恢复 styles
-                disabledSheets.forEach(link => { link.disabled = false; });
+                // 恢复 transform 样式
+                card.style.transform = originalTransform;
+                card.style.transformOrigin = originalTransformOrigin;
+                if (parentEl) {
+                    parentEl.style.height = originalParentHeight;
+                }
 
                 // 恢复 document.fonts
                 if (originalFonts) {
