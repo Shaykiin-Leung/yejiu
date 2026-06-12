@@ -13551,236 +13551,13 @@ function generateDailyStatus(checkins, dateStr) {
 
         function showHealthShareModal() {
             return showHealthGuideShareModalV2();
-            const {
-                sleepDebt: rawSleepDebt,
-                dangerCount: rawDangerCount,
-                challengeCount,
-                consecutiveDangerStreak: rawStreak,
-                recent3DayDebt
-            } = calculateRealHealthData();
-
-            if (!window.healthSimModifiers) {
-                window.healthSimModifiers = { sleepDebtOffset: 0, consecutiveDangerStreakOffset: 0, dangerCountOffset: 0, liverOffset: 0, eyeOffset: 0, heartOffset: 0 };
-            }
-
-            const sleepDebt = Math.max(0, rawSleepDebt + window.healthSimModifiers.sleepDebtOffset);
-            const consecutiveDangerStreak = Math.max(0, rawStreak + window.healthSimModifiers.consecutiveDangerStreakOffset);
-            const dangerCount = Math.max(0, rawDangerCount + window.healthSimModifiers.dangerCountOffset);
-
-            let liverLoad = Math.min(100, Math.max(0, Math.round(sleepDebt / 20 * 100) + window.healthSimModifiers.liverOffset));
-            let eyeLoad = Math.min(100, Math.max(0, Math.round((dangerCount + challengeCount * 0.5) / 20 * 100) + window.healthSimModifiers.eyeOffset));
-            let heartLoad = Math.min(100, Math.max(0, (consecutiveDangerStreak * 25 + Math.round(recent3DayDebt * 3)) + window.healthSimModifiers.heartOffset));
-
-            let healthRating = 100;
-            if (sleepDebt > 0 || consecutiveDangerStreak > 0) {
-                const rawDeduction = Math.round(liverLoad * 0.4 + eyeLoad * 0.2 + heartLoad * 0.4);
-                healthRating = Math.max(12, 100 - rawDeduction);
-            }
-            const recoveryRoom = Math.max(0, 100 - heartLoad);
-
-            // 分享卡状态名称
-            let levelTitle = "满电观赛状态";
-            let accentColor = "#d4d4d8";
-            const hostAccents = WORLDCUP_HOST_ACCENTS;
-            const pitchAccent = hostAccents.green;
-            const hostRibbon = getHostRibbon();
-            const hostGlow = getHostGlow('16');
-            const hostDotsHTML = getHostDotsHTML(4, 4, 0.86);
-            let stampText = "PLAN SET";
-
-            if (healthRating < 60) {
-                levelTitle = "低电量观赛状态";
-                accentColor = "#f4f4f5";
-                stampText = "REST FIRST";
-            } else if (healthRating < 80) {
-                levelTitle = "高压缩观赛状态";
-                accentColor = "#e4e4e7";
-                stampText = "SELECTIVE";
-            } else if (healthRating < 90) {
-                levelTitle = "需要补觉的观赛状态";
-                accentColor = "#cbd5e1";
-                stampText = "ADJUST";
-            }
-
-            // 观赛方案分享文案
-            const quotes = {
-                critical: [
-                    "今晚挑核心场，留一场给热爱，留一晚给恢复。",
-                    "状态已经低电量，先保住明早，再谈加时。",
-                    "球可以补看，睡眠窗口补不回来。"
-                ],
-                overclocked: [
-                    "能看，也要留余量；主队优先，路人局交给补看。",
-                    "赛前先眯，赛后断网，这才是长赛程玩法。",
-                    "把观赛预算花在真正想看的那一场。"
-                ],
-                warning: [
-                    "现在状态还行，关键是看完及时收束。",
-                    "提前小睡，按点收工，明早会感谢今晚的你。",
-                    "看球不是硬扛，稳定节奏才能看到最后。"
-                ],
-                stable: [
-                    "今晚节奏不错，可以把精力留给真正的焦点战。",
-                    "不熬也能收卡，理性观赛也是一种世界杯人格。",
-                    "睡够再看球，热爱会更持久。"
-                ]
-            };
-
-            let selectedQuotes = quotes.stable;
-            if (healthRating < 60) selectedQuotes = quotes.critical;
-            else if (healthRating < 80) selectedQuotes = quotes.overclocked;
-            else if (healthRating < 90) selectedQuotes = quotes.warning;
-
-            const randomQuote = selectedQuotes[Math.floor(Math.random() * selectedQuotes.length)];
-            const dateStr = new Date().toISOString().substring(0,10).replace(/-/g,'.');
-
-            const existingModal = document.getElementById('health-share-modal');
-            if (existingModal) existingModal.remove();
-
-            const modal = document.createElement('div');
-            modal.id = 'health-share-modal';
-            modal.style.cssText = 'position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px; overflow:hidden;';
-
-            modal.innerHTML = `
-                <!-- Backdrop sibling to prevent mix-blend-mode isolation -->
-                <div style="position:absolute; inset:0; background:rgba(0,0,0,0.92); backdrop-filter:blur(25px); z-index:1;" onclick="document.getElementById('health-share-modal').remove()"></div>
-
-                <div class="yejiu-modal-pop" style="width:100%; max-width:350px; margin:auto; display:flex; flex-direction:column; gap:10px; box-sizing:border-box; position:relative; z-index:2;">
-                    <!-- 顶部标题栏 -->
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; padding: 0 4px;">
-                        <div style="font-size:13px; font-weight:800; color:#ffffff; display:flex; align-items:center; gap:8px; letter-spacing:0.04em;">
-                            <svg onclick="document.getElementById('health-share-modal').remove()" style="cursor:pointer; color:#a1a1aa;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                            绿茵观赛方案卡分享
-                        </div>
-                    </div>
-
-                    <div id="health-poster-card" style="background:#080808; border-radius:24px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Outfit','Noto Sans SC',sans-serif; width:100%;">
-                        <!-- 顶部渐变扫光细线 -->
-                        <div style="height:3px; background:${hostRibbon};"></div>
-
-                        <!-- 背景网格与径向渐变 -->
-                        <div style="position:absolute; inset:0; background:${hostGlow}; pointer-events:none;"></div>
-                        <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px); background-size:18px 18px; pointer-events:none;"></div>
-
-                        <div style="padding:22px 20px 18px; position:relative;">
-                            <!-- 顶栏 -->
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
-                                <div>
-                                    <div style="font-size:9px; font-weight:900; color:rgba(255,255,255,0.65); letter-spacing:0.12em; text-transform:uppercase; font-family:monospace;">2026 FIFA WORLD CUP</div>
-                                    <div style="font-size:7px; color:rgba(255,255,255,0.22); letter-spacing:0.08em; margin-top:2px; text-transform:uppercase; font-family:monospace;">NIGHTOWL GUIDE &middot; WATCH PLAN</div>
-                                    <div style="display:flex; gap:5px; align-items:center; margin-top:7px; opacity:0.82;">${hostDotsHTML}</div>
-                                </div>
-                                <div style="font-size:8px; font-weight:700; color:#e5e7eb; letter-spacing:0.06em; font-family:monospace; margin-top:1px;">${dateStr}</div>
-                            </div>
-
-                            <!-- 综合评分中心表盘 (Speedometer style) -->
-                            <div style="text-align:center; margin-bottom:14px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                                <div style="position:relative; width:112px; height:112px; display:flex; align-items:center; justify-content:center;">
-                                    <svg width="112" height="112" viewBox="0 0 112 112" style="transform: rotate(-90deg);">
-                                        <circle cx="56" cy="56" r="46" stroke="#141416" stroke-width="6" fill="transparent" />
-                                        <circle cx="56" cy="56" r="46" stroke="${accentColor}" stroke-width="6" fill="transparent"
-                                            stroke-dasharray="289.02"
-                                            stroke-dashoffset="${289.02 - (289.02 * healthRating / 100)}"
-                                            stroke-linecap="round" />
-                                        <circle cx="56" cy="56" r="51" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3 5" fill="transparent" />
-                                    </svg>
-                                    <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                                        <span style="font-size:26px; font-weight:900; color:#ffffff; line-height:1; letter-spacing:-0.03em;">${healthRating}</span>
-                                        <span style="font-size:6.5px; font-weight:900; color:rgba(255,255,255,0.3); margin-top:3px; letter-spacing:0.1em; text-transform:uppercase; font-family:monospace;">GUIDE VALUE</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 观赛状态标签 -->
-                            <div style="text-align:center; margin-bottom:12px;">
-                                <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.09); border-radius:999px; padding:3px 12px; margin-bottom:4px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);">
-                                    <span style="display:inline-flex; align-items:center; gap:3px; flex-shrink:0;">${hostDotsHTML}</span>
-                                    <span style="font-size:7px; font-weight:900; color:${accentColor}; letter-spacing:0.14em; text-transform:uppercase; font-family:monospace;">WATCH PLAN STATUS</span>
-                                </div>
-                                <div style="font-size:20px; font-weight:900; color:#ffffff; letter-spacing:-0.03em; line-height:1.2; margin-top:4px;">${levelTitle}</div>
-                            </div>
-
-                            <!-- 方案提示 (Vibe Quote) -->
-                            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:14px; padding:11px 14px; margin-bottom:14px; text-align:center;">
-                                <div style="font-size:10.5px; color:#ffffff; font-weight:500; font-style:italic; line-height:1.6; max-width:240px; margin:0 auto;">
-                                    “${randomQuote}”
-                                </div>
-                            </div>
-
-                            <!-- 观赛负荷条 -->
-                            <div style="border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:12px 14px; margin-bottom:14px; background:rgba(255,255,255,0.01);">
-                                <div style="font-size:7px; font-weight:900; color:rgba(255,255,255,0.3); font-family:monospace; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:8px;">WATCH LOAD / 观赛负荷</div>
-                                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
-                                    <div style="background:linear-gradient(180deg, ${hostAccents.red}10, rgba(255,255,255,0.025)); border:1px solid ${hostAccents.red}24; border-radius:10px; padding:8px 4px; text-align:center;">
-                                        <div style="font-size:15px; font-weight:900; color:${hostAccents.red}; line-height:1;">${liverLoad}%</div>
-                                        <div style="font-size:6.5px; color:rgba(255,255,255,0.3); margin-top:4px; font-weight:700; letter-spacing:0.02em;">睡眠压力</div>
-                                    </div>
-                                    <div style="background:linear-gradient(180deg, ${hostAccents.blue}10, rgba(255,255,255,0.025)); border:1px solid ${hostAccents.blue}24; border-radius:10px; padding:8px 4px; text-align:center;">
-                                        <div style="font-size:15px; font-weight:900; color:${hostAccents.blue}; line-height:1;">${eyeLoad}%</div>
-                                        <div style="font-size:6.5px; color:rgba(255,255,255,0.3); margin-top:4px; font-weight:700; letter-spacing:0.02em;">屏幕负荷</div>
-                                    </div>
-                                    <div style="background:linear-gradient(180deg, ${hostAccents.green}10, rgba(255,255,255,0.025)); border:1px solid ${hostAccents.green}24; border-radius:10px; padding:8px 4px; text-align:center;">
-                                        <div style="font-size:15px; font-weight:900; color:${hostAccents.green}; line-height:1;">${recoveryRoom}%</div>
-                                        <div style="font-size:6.5px; color:rgba(255,255,255,0.3); margin-top:4px; font-weight:700; letter-spacing:0.02em;">恢复余量</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 轨迹数据面板 -->
-                            <div style="border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:10px 14px; margin-bottom:14px; background:rgba(255,255,255,0.015); text-align:center; position:relative; overflow:hidden;">
-                                <div style="position:absolute; top:0; left:18px; right:18px; height:1px; background:${hostRibbon}; opacity:0.7;"></div>
-                                <div style="font-size:10px; color:rgba(255,255,255,0.5); line-height:1.6; font-weight:500;">
-                                    累积熬夜 <span style="color:#ffffff; font-weight:900;">${dangerCount}</span> 天
-                                    &nbsp;·&nbsp; 连续 <span style="color:#ffffff; font-weight:900;">${consecutiveDangerStreak}</span> 日
-                                    &nbsp;·&nbsp; 未回收负荷 <span style="color:#ffffff; font-weight:900;">${sleepDebt % 1 === 0 ? sleepDebt : sleepDebt.toFixed(1)}h</span>
-                                </div>
-                                <div style="font-size:6.5px; color:rgba(255,255,255,0.24); margin-top:5px; line-height:1.4;">基于赛程与打卡的观赛建议，不构成医学诊断。</div>
-                            </div>
-
-                            <!-- 底部：二维码 + 品牌印章 -->
-                            <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.07); padding-top:12px;">
-                                <div style="display:flex; flex-direction:column; gap:3px; align-items:center;">
-                                    <div id="health-qrcode-box" style="width:44px; height:44px; background:#fff; border-radius:5px; overflow:hidden; display:flex; align-items:center; justify-content:center;"></div>
-                                    <div style="font-size:7px; color:#e5e7eb; opacity:0.72; font-family:monospace;">扫码做方案</div>
-                                </div>
-                                <div style="text-align:center; flex:1;">
-                                    <div style="font-size:7.5px; color:rgba(255,255,255,0.18); font-family:monospace; letter-spacing:0.06em;">夜啾 NIGHTBIRD · 2026</div>
-                                </div>
-                                <div style="display:flex; align-items:center; justify-content:flex-end;">
-                                    <div style="font-size:10px; color:${accentColor}; font-weight:900; text-transform:uppercase;
-                                                border:2px solid ${accentColor}; border-radius:5px; padding:4px 9px;
-                                                transform:rotate(-8deg); font-family:monospace; letter-spacing:0.1em;
-                                                box-shadow:0 0 14px ${accentColor}55, inset 0 0 6px ${accentColor}18;">
-                                        ${stampText}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 底部 accent 色条 -->
-                        <div style="height:2px; background:${hostRibbon}; opacity:0.82;"></div>
-                    </div>
-
-                    <!-- 一键生成海报按钮 -->
-                    <button id="health-share-btn" onclick="captureCard('health-poster-card', 'health-share-btn', '夜啾_世界杯观赛方案卡')" style="width:100%; padding:14px; background:#ffffff; color:#000000; border:none; border-radius:16px; font-size:13px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:0.05em; font-family:'Outfit','Noto Sans SC',sans-serif; box-shadow:0 4px 20px rgba(255,255,255,0.12); transition:all 0.15s ease;" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                        📸 生成分享海报
-                    </button>
-                    <div style="text-align:center; font-size:10px; color:#3f3f46;">生成观赛方案卡，支持长按保存或分享微信</div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-
-            requestAnimationFrame(() => {
-                _renderQRCode('health-qrcode-box', 44);
-            });
         }
 
 
         async function captureCard(cardId, btnId, fileName) {
             const card = document.getElementById(cardId);
             const btn  = document.getElementById(btnId);
-            if (!card) { showToast('卡片元素未找到'); return; }
+            if (!card) { showToast('没有找到可生成的海报卡片'); return; }
 
             // loading 状态
             const originalHTML = btn ? btn.innerHTML : '';
@@ -13815,6 +13592,17 @@ function generateDailyStatus(checkins, dateStr) {
                 console.warn('Error disabling stylesheets:', sheetErr);
             }
 
+            // 临时添加全局样式以剥离所有 mask-image 和 -webkit-mask-image，防止 html2canvas 内部 createPattern 崩溃
+            const maskStyle = document.createElement('style');
+            maskStyle.id = 'html2canvas-mask-override';
+            maskStyle.innerHTML = `
+                * {
+                    -webkit-mask-image: none !important;
+                    mask-image: none !important;
+                }
+            `;
+            document.head.appendChild(maskStyle);
+
             const originalSrcs = [];
             const imgs = Array.from(card.querySelectorAll('img'));
 
@@ -13841,8 +13629,8 @@ function generateDailyStatus(checkins, dateStr) {
             }
 
             try {
-                // 将整个过程包裹在 5 秒的超时控制中，确保即使某处挂起也能在 5 秒内退出并恢复状态
-                const canvas = await new Promise((resolve, reject) => {
+                // 将整个过程包裹在 5 秒的超时控制中
+                const dataUrl = await new Promise((resolve, reject) => {
                     const timer = setTimeout(() => {
                         reject(new Error("渲染超时"));
                     }, 5000);
@@ -13868,13 +13656,14 @@ function generateDailyStatus(checkins, dateStr) {
                                 backgroundColor: '#000000',
                                 scale: scaleValue,
                                 useCORS: true,
-                                allowTaint: true, // 允许 tainted canvas 作为兜底，由于已转为 Base64，通常不会触发 taint 报错
+                                allowTaint: true,
                                 logging: false,
                                 imageTimeout: 1000
                             });
                             
+                            const dUrl = c.toDataURL('image/png');
                             clearTimeout(timer);
-                            resolve(c);
+                            resolve(dUrl);
                         } catch(innerErr) {
                             clearTimeout(timer);
                             reject(innerErr);
@@ -13882,53 +13671,8 @@ function generateDailyStatus(checkins, dateStr) {
                     })();
                 });
 
-                // 生成 PNG DataURL
-                const dataUrl = canvas.toDataURL('image/png');
-
-                // 在卡片上覆盖一层可供长按保存的图片
-                const existingImg = card.querySelector('.generated-share-img');
-                if (existingImg) existingImg.remove();
-
-                const img = document.createElement('img');
-                img.src = dataUrl;
-                img.className = 'generated-share-img';
-                img.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; opacity:1; z-index:100; border-radius:inherit; object-fit:contain; pointer-events:auto;';
-                
-                if (getComputedStyle(card).position === 'static') {
-                    card.style.position = 'relative';
-                }
-                card.appendChild(img);
-
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                if (isMobile) {
-                    showToast('🎉 海报已生成！长按上方卡片即可保存或分享');
-                    if (navigator.share && navigator.canShare) {
-                        try {
-                            canvas.toBlob(async function(blob) {
-                                const safeFileName = (fileName || '夜啾_分享卡片') + '.png';
-                                const file = new File([blob], safeFileName, { type: 'image/png' });
-                                if (navigator.canShare({ files: [file] })) {
-                                    await navigator.share({
-                                        files: [file],
-                                        title: '夜啾 · 2026世界杯熬夜护航者'
-                                    });
-                                }
-                            }, 'image/png', 1.0);
-                        } catch(e) {
-                            console.warn('Web Share failed:', e);
-                        }
-                    }
-                } else {
-                    try {
-                        canvas.toBlob(function(blob) {
-                            const safeFileName = (fileName || '夜啾_分享卡片') + '.png';
-                            _downloadBlob(blob, safeFileName);
-                        }, 'image/png', 1.0);
-                    } catch(blobErr) {
-                        console.error('toBlob error on desktop:', blobErr);
-                        showToast('生成海报失败，请稍后重试');
-                    }
-                }
+                // 打开预览分享面板，并传入预渲染的 dataUrl
+                openPosterShareSheet(cardId, fileName, dataUrl);
 
             } catch(err) {
                 console.error('captureCard error:', err);
@@ -13936,6 +13680,9 @@ function generateDailyStatus(checkins, dateStr) {
             } finally {
                 // 恢复图片 src
                 originalSrcs.forEach(({ img, src }) => { img.src = src; });
+
+                // 移除临时样式
+                if (maskStyle) maskStyle.remove();
 
                 // 恢复 styles
                 disabledSheets.forEach(link => { link.disabled = false; });
@@ -13961,18 +13708,205 @@ function generateDailyStatus(checkins, dateStr) {
             }
         }
 
-        function _downloadBlob(blob, fileName) {
-            const url = URL.createObjectURL(blob);
+        function openPosterShareSheet(cardId, fileName, dataUrl) {
+            const card = document.getElementById(cardId);
+            if (!card) { showToast('没有找到可分享的海报卡片'); return; }
+
+            closePosterShareSheet();
+            const payload = buildPosterSharePayload(card, fileName);
+            const shareId = "share-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+            window.__yejiuPosterShares = window.__yejiuPosterShares || {};
+            window.__yejiuPosterShares[shareId] = { cardId, fileName, payload, dataUrl };
+
+            // SVGs for social platforms matching Figure 3 style
+            const downloadIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+            const wechatIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>`;
+            const momentsIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"/></svg>`;
+            const qqIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+            const qqZoneIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+            const copyIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+            const linkIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
+
+            const modal = document.createElement('div');
+            modal.id = 'poster-share-sheet';
+            modal.style.cssText = 'position:fixed; inset:0; z-index:10010; background:rgba(0,0,0,0.78); backdrop-filter:blur(12px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px;';
+            modal.innerHTML = `
+                <!-- Card Preview (Aspect 9/16, centered) -->
+                <div style="width:100%; max-width:280px; height:min(54vh, 480px); border-radius:20px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.6); background:#050505; border:1px solid rgba(255,255,255,0.08);">
+                    <img src="${dataUrl}" style="width:100%; height:100%; object-fit:contain; display:block; pointer-events:auto;" alt="夜啾分享卡">
+                </div>
+
+                <!-- Sharing Platform Buttons (Circular, Colorful Gradients) -->
+                <div style="width:100%; max-width:360px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:20px; padding:0 8px;">
+                    ${posterShareButtonHTML(shareId, 'saveImage', '保存本地', downloadIcon, 'linear-gradient(135deg, #7c3aed, #4f46e5)')}
+                    ${posterShareButtonHTML(shareId, 'wechat', '微信', wechatIcon, 'linear-gradient(135deg, #22c55e, #16a34a)')}
+                    ${posterShareButtonHTML(shareId, 'moments', '朋友圈', momentsIcon, 'linear-gradient(135deg, #0d9488, #0f766e)')}
+                    ${posterShareButtonHTML(shareId, 'qq', 'QQ', qqIcon, 'linear-gradient(135deg, #0ea5e9, #2563eb)')}
+                    ${posterShareButtonHTML(shareId, 'qqzone', 'QQ空间', qqZoneIcon, 'linear-gradient(135deg, #f59e0b, #d97706)')}
+                    ${posterShareButtonHTML(shareId, 'copyText', '复制文案', copyIcon, 'linear-gradient(135deg, #ec4899, #db2777)')}
+                    ${posterShareButtonHTML(shareId, 'copyLink', '复制链接', linkIcon, 'linear-gradient(135deg, #64748b, #475569)')}
+                </div>
+
+                <!-- Close Button (X at the bottom) -->
+                <button type="button" onclick="closePosterShareSheet()" style="width:40px; height:40px; border-radius:999px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.08); color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:22px; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">×</button>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function closePosterShareSheet() {
+            const modal = document.getElementById('poster-share-sheet');
+            if (modal) modal.remove();
+        }
+
+        function posterShareButtonHTML(shareId, channel, label, iconHtml, gradient) {
+            return `
+                <div style="text-align:center; flex:0 0 auto;">
+                    <button type="button" onclick="sharePosterVia('${shareId}', '${channel}')" style="width:44px; height:44px; border-radius:999px; border:none; background:${gradient}; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.3); margin:0 auto; cursor:pointer; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.92)'" onmouseup="this.style.transform='scale(1)'">
+                        ${iconHtml}
+                    </button>
+                    <div style="font-size:9.5px; color:rgba(255,255,255,0.78); margin-top:5px; font-weight:500; white-space:nowrap; font-family:'Outfit','Noto Sans SC',sans-serif;">${label}</div>
+                </div>
+            `;
+        }
+
+        async function sharePosterVia(shareId, channel) {
+            const shareData = window.__yejiuPosterShares?.[shareId];
+            if (!shareData) { showToast('分享内容已失效，请重新打开'); return; }
+            const { payload, fileName, dataUrl } = shareData;
+
+            if (channel === 'system') {
+                if (navigator.share) {
+                    try {
+                        await navigator.share({ title: payload.title, text: payload.text, url: payload.url !== '夜啾' ? payload.url : undefined });
+                        return;
+                    } catch (err) {
+                        if (err?.name === 'AbortError') return;
+                    }
+                }
+                await copyPosterText(payload.text);
+                showToast('已复制分享文案');
+                return;
+            }
+
+            if (channel === 'saveImage') {
+                if (!dataUrl) { showToast('没有找到可保存的海报图片'); return; }
+                showToast('正在调起保存...');
+                try {
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    if (isMobile && navigator.share && navigator.canShare) {
+                        const response = await fetch(dataUrl);
+                        const blob = await response.blob();
+                        const file = new File([blob], `${fileName || '夜啾_分享海报'}.png`, { type: 'image/png' });
+                        if (navigator.canShare({ files: [file] })) {
+                            await navigator.share({ files: [file], title: payload.title, text: payload.text });
+                            return;
+                        }
+                    }
+                    showPosterPreview(dataUrl, fileName);
+                } catch (err) {
+                    console.warn('Save poster image failed:', err);
+                    showPosterPreview(dataUrl, fileName);
+                }
+                return;
+            }
+
+            if (channel === 'qqzone') {
+                const qzoneUrl = "https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=" + encodeURIComponent(payload.url) + "&title=" + encodeURIComponent(payload.title) + "&summary=" + encodeURIComponent(payload.text);
+                window.open(qzoneUrl, '_blank');
+                return;
+            }
+
+            if (channel === 'copyLink') {
+                await copyPosterText(payload.url);
+                showToast('链接已复制');
+                return;
+            }
+
+            const platformName = {
+                wechat: '微信',
+                moments: '朋友圈',
+                qq: 'QQ',
+                copyText: '剪贴板'
+            }[channel] || '目标 App';
+            await copyPosterText(payload.text);
+            showToast(channel === 'copyText' ? '文案已复制' : "文案已复制，打开" + platformName + "粘贴发布");
+        }
+
+        async function copyPosterText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+            } catch (err) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.cssText = 'position:fixed; left:-9999px; top:0;';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                document.execCommand('copy');
+                textarea.remove();
+            }
+        }
+
+        function showPosterPreview(dataUrl, fileName) {
+            const old = document.getElementById('poster-preview-modal');
+            if (old) old.remove();
+            const safeName = (fileName || '夜啾_分享海报').replace(/'/g, "\'");
+            const modal = document.createElement('div');
+            modal.id = 'poster-preview-modal';
+            modal.style.cssText = 'position:fixed; inset:0; z-index:10020; background:rgba(0,0,0,0.92); backdrop-filter:blur(18px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px;';
+            modal.innerHTML = `
+                <div style="width:100%; max-width:390px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div style="color:#fff; font-size:14px; font-weight:900;">长按下方图片保存</div>
+                    <button type="button" onclick="document.getElementById('poster-preview-modal')?.remove()" style="width:40px; height:40px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:#fff; font-size:22px;">×</button>
+                </div>
+                <img src="${dataUrl}" alt="夜啾分享海报" style="width:100%; max-width:390px; max-height:76vh; object-fit:contain; border-radius:22px; border:1px solid rgba(255,255,255,0.12); box-shadow:0 26px 80px rgba(0,0,0,0.7);">
+                <div style="width:100%; max-width:390px; margin-top:12px; display:flex; gap:10px;">
+                    <button type="button" onclick="_downloadDataUrl('${dataUrl}', '${safeName}.png')" style="flex:1; height:48px; border:none; border-radius:16px; background:#fff; color:#000; font-size:13px; font-weight:900;">下载图片</button>
+                    <button type="button" onclick="document.getElementById('poster-preview-modal')?.remove()" style="width:92px; height:48px; border:1px solid rgba(255,255,255,0.12); border-radius:16px; background:rgba(255,255,255,0.05); color:#fff; font-size:13px; font-weight:900;">返回</button>
+                </div>
+                <div style="margin-top:10px; color:rgba(255,255,255,0.38); font-size:11px; text-align:center;">手机端请长按图片选择“保存到相册”或“发送给朋友”</div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function _downloadDataUrl(dataUrl, fileName) {
             const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
+            a.href = dataUrl;
+            a.download = fileName || '夜啾_分享海报.png';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            setTimeout(function() { URL.revokeObjectURL(url); }, 3000);
-            showToast('📥 海报已保存！快分享到微信吧');
+            showToast('海报已保存');
         }
 
+        function escapePosterShareHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function getPosterShareUrl() {
+            const cleanPath = `${location.origin || ''}${location.pathname || ''}`;
+            if (location.protocol === 'file:') return '夜啾';
+            return cleanPath || location.href.split('#')[0];
+        }
+
+        function buildPosterSharePayload(card, fileName) {
+            const rawLines = (card.innerText || '').split('\n')
+                .map(line => line.trim())
+                .filter(Boolean)
+                .filter(line => !/生成|保存|扫码|UNDERSTOOD|FIFA WORLD CUP/i.test(line));
+            const titleLine = rawLines.find(line => /[\u4e00-\u9fa5]/.test(line) && line.length >= 4 && line.length <= 24) || fileName || '夜啾观赛海报';
+            const secondLine = rawLines.find(line => line !== titleLine && /[\u4e00-\u9fa5]/.test(line) && line.length >= 8 && line.length <= 56) || '今晚的看球状态，交给夜啾记录。';
+            const url = getPosterShareUrl();
+            const title = "夜啾｜" + titleLine;
+            const text = titleLine + "\n" + secondLine + "\n\n我用夜啾生成了自己的世界杯观赛卡。" + (url && url !== '夜啾' ? "\n" + url : '');
+            return { title, text, url, titleLine, secondLine };
+        }
                 </script>
     <!-- ============ 头像选择模态弹窗 ============ -->
     <div id="avatar-selector-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[9999] hidden items-center justify-center p-4">
