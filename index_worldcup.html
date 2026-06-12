@@ -13790,20 +13790,19 @@ function generateDailyStatus(checkins, dateStr) {
                 btn.style.opacity = '0.7';
             }
 
-            // 备份并绕过 WebView 著名的 document.fonts.ready 挂起 bug
-            const originalFontsReady = document.fonts ? document.fonts.ready : null;
-            if (document.fonts) {
-                try {
-                    Object.defineProperty(document.fonts, 'ready', {
-                        get: function() { return Promise.resolve(); },
-                        configurable: true
-                    });
-                } catch(fontErr) {
-                    console.warn('Cannot override document.fonts.ready:', fontErr);
-                }
+            // 备份并隐藏 document.fonts 以绕过 WebView 著名的 document.fonts.ready 挂起 bug
+            const originalFonts = document.fonts;
+            try {
+                Object.defineProperty(document, 'fonts', {
+                    value: undefined,
+                    writable: true,
+                    configurable: true
+                });
+            } catch(fontErr) {
+                console.warn('Cannot hide document.fonts:', fontErr);
             }
 
-            // 临时禁用外部字体/样式表，以防止 html2canvas 网络挂起
+            // 临时禁用外部样式表，防止 html2canvas 内部样式表下载挂起
             const disabledSheets = [];
             try {
                 Array.from(document.querySelectorAll('link[rel="stylesheet"]')).forEach(link => {
@@ -13816,15 +13815,17 @@ function generateDailyStatus(checkins, dateStr) {
                 console.warn('Error disabling stylesheets:', sheetErr);
             }
 
-            // 收集卡片内的图片并并行转换为 Base64，彻底解决 file:// 下 CORS/Taint 与加载超时问题
             const originalSrcs = [];
             const imgs = Array.from(card.querySelectorAll('img'));
-            
-            // 异步 Base64 转换函数
+
+            // 异步 Base64 转换函数（带 600ms 严格超时 abort 控制）
             async function toBase64(url) {
+                if (!url || url.startsWith('data:')) return url;
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 600);
                 try {
-                    if (!url || url.startsWith('data:')) return url;
-                    const response = await fetch(url);
+                    const response = await fetch(url, { signal: controller.signal });
+                    clearTimeout(timeoutId);
                     const blob = await response.blob();
                     return new Promise((resolve, reject) => {
                         const reader = new FileReader();
@@ -13833,46 +13834,52 @@ function generateDailyStatus(checkins, dateStr) {
                         reader.readAsDataURL(blob);
                     });
                 } catch (e) {
+                    clearTimeout(timeoutId);
                     console.warn('Failed to convert image to base64:', url, e);
                     return url;
                 }
             }
 
             try {
-                // 并行转换所有图片
-                await Promise.all(imgs.map(async img => {
-                    const originalSrc = img.src;
-                    originalSrcs.push({ img, src: originalSrc });
-                    const base64 = await toBase64(originalSrc);
-                    img.src = base64;
-                }));
-
-                // 等待短暂时间让 DOM 渲染及 QR 码图片完全就绪
-                await new Promise(r => setTimeout(r, 200));
-
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                const scaleValue = isMobile ? 1.5 : 2;
-
-                // 包装 html2canvas 为带超时控制的 Promise
-                const renderPromise = html2canvas(card, {
-                    backgroundColor: '#000000',
-                    scale: scaleValue,
-                    useCORS: true,
-                    allowTaint: true, // 允许 tainted canvas 作为兜底，由于已转为 Base64，通常不会触发 taint 报错
-                    logging: false,
-                    imageTimeout: 1000 // 缩短图片加载超时时间
-                });
-
-                // 超时设定为 5 秒，防止渲染卡死
-                const timeoutSec = 5000;
+                // 将整个过程包裹在 5 秒的超时控制中，确保即使某处挂起也能在 5 秒内退出并恢复状态
                 const canvas = await new Promise((resolve, reject) => {
                     const timer = setTimeout(() => {
-                        reject(new Error("html2canvas timeout"));
-                    }, timeoutSec);
-                    renderPromise.then(
-                        res => { clearTimeout(timer); resolve(res); },
-                        err => { clearTimeout(timer); reject(err); }
-                    );
+                        reject(new Error("渲染超时"));
+                    }, 5000);
+
+                    (async () => {
+                        try {
+                            // 1. 并行转换所有图片为 Base64
+                            await Promise.all(imgs.map(async img => {
+                                const originalSrc = img.src;
+                                originalSrcs.push({ img, src: originalSrc });
+                                const base64 = await toBase64(originalSrc);
+                                img.src = base64;
+                            }));
+
+                            // 2. 等待 DOM 更新
+                            await new Promise(r => setTimeout(r, 100));
+
+                            // 3. 运行 html2canvas
+                            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                            const scaleValue = isMobile ? 1.5 : 2;
+
+                            const c = await html2canvas(card, {
+                                backgroundColor: '#000000',
+                                scale: scaleValue,
+                                useCORS: true,
+                                allowTaint: true, // 允许 tainted canvas 作为兜底，由于已转为 Base64，通常不会触发 taint 报错
+                                logging: false,
+                                imageTimeout: 1000
+                            });
+                            
+                            clearTimeout(timer);
+                            resolve(c);
+                        } catch(innerErr) {
+                            clearTimeout(timer);
+                            reject(innerErr);
+                        }
+                    })();
                 });
 
                 // 生成 PNG DataURL
@@ -13892,10 +13899,9 @@ function generateDailyStatus(checkins, dateStr) {
                 }
                 card.appendChild(img);
 
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 if (isMobile) {
                     showToast('🎉 海报已生成！长按上方卡片即可保存或分享');
-                    
-                    // 仅在支持 Web Share 时尝试调起系统分享
                     if (navigator.share && navigator.canShare) {
                         try {
                             canvas.toBlob(async function(blob) {
@@ -13913,7 +13919,6 @@ function generateDailyStatus(checkins, dateStr) {
                         }
                     }
                 } else {
-                    // 桌面端：自动触发文件下载
                     try {
                         canvas.toBlob(function(blob) {
                             const safeFileName = (fileName || '夜啾_分享卡片') + '.png';
@@ -13927,7 +13932,7 @@ function generateDailyStatus(checkins, dateStr) {
 
             } catch(err) {
                 console.error('captureCard error:', err);
-                showToast('截图生成失败，请长按屏幕截图保存');
+                showToast('截图生成失败: ' + err.message + '，请长按屏幕保存');
             } finally {
                 // 恢复图片 src
                 originalSrcs.forEach(({ img, src }) => { img.src = src; });
@@ -13935,17 +13940,19 @@ function generateDailyStatus(checkins, dateStr) {
                 // 恢复 styles
                 disabledSheets.forEach(link => { link.disabled = false; });
 
-                // 恢复 fonts.ready 属性
-                if (document.fonts && originalFontsReady) {
+                // 恢复 document.fonts
+                if (originalFonts) {
                     try {
-                        Object.defineProperty(document.fonts, 'ready', {
-                            get: function() { return originalFontsReady; },
+                        Object.defineProperty(document, 'fonts', {
+                            value: originalFonts,
+                            writable: true,
                             configurable: true
                         });
                     } catch(restoreErr) {
-                        console.warn('Cannot restore document.fonts.ready:', restoreErr);
+                        console.warn('Cannot restore document.fonts:', restoreErr);
                     }
                 }
+
                 if (btn) {
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
