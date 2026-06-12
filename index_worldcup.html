@@ -13581,14 +13581,23 @@ function generateDailyStatus(checkins, dateStr) {
             const wrapperWidth = wrapper.getBoundingClientRect().width || wrapper.clientWidth;
             if (!wrapperWidth) return;
 
-            const cardWidth = 360;
-            if (wrapperWidth >= cardWidth) return; // 幕宽足够，无需缩放
+            const cardWidth  = 360;
+            const cardHeight = 640;
 
-            // 使用 CSS zoom 而非 transform:scale：
-            // zoom 会同时缩放视觉大小和 layout 尺寸，不会产生 overflow/裁剪或错位
-            const scale = wrapperWidth / cardWidth;
-            card.style.zoom = scale.toFixed(5);
-            card.style.margin = '0 auto';
+            // 宽度约束：若 wrapper 比卡片窄则按宽缩放
+            const scaleByWidth = wrapperWidth >= cardWidth ? 1 : wrapperWidth / cardWidth;
+
+            // 高度约束：为 modal 其他 UI（标题栏、按钮、间距、内边距）预留约 185px
+            const availableH = (window.innerHeight || 667) - 185;
+            const scaleByHeight = availableH >= cardHeight ? 1 : availableH / cardHeight;
+
+            // 取更严格的那个约束
+            const scale = Math.min(scaleByWidth, scaleByHeight);
+
+            if (scale < 0.9999) {
+                card.style.zoom = scale.toFixed(5);
+                card.style.margin = '0 auto';
+            }
         }
 
         window.addEventListener('resize', () => {
@@ -13805,7 +13814,7 @@ function generateDailyStatus(checkins, dateStr) {
             modal.style.cssText = 'position:fixed; inset:0; z-index:10010; background:rgba(0,0,0,0.8); backdrop-filter:blur(12px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px;';
             modal.innerHTML = `
                 <!-- Card Preview (Aspect 9/16, centered) -->
-                <div style="width:100%; max-width:280px; height:min(54vh, 480px); border-radius:20px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.6); background:#050505; border:1px solid rgba(255,255,255,0.08);">
+                <div style="width:100%; max-width:320px; height:min(65vh, 540px); border-radius:20px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.6); background:#050505; border:1px solid rgba(255,255,255,0.08);">
                     <img src="${dataUrl}" style="width:100%; height:100%; object-fit:contain; display:block; pointer-events:auto;" alt="夜啾分享卡">
                 </div>
 
