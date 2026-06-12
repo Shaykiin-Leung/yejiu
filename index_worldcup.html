@@ -6018,10 +6018,10 @@ const CUSTOM_MATCH_ADVICE = {
                     </div>
 
                     <!-- ⑤ 状态小票：比大数据卡更轻，更像晒卡 -->
-                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px 6px;position:relative;z-index:10;line-height:1.35;">
-                        <span style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;line-height:1.35;">观赛 ${dailyWatchHours}h</span>
-                        <span style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;line-height:1.35;">醒后 ${_afterStateText}</span>
-                        <span style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;line-height:1.35;">收录 ${_matchEntries.length}场</span>
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px 6px;position:relative;z-index:10;line-height:1;">
+                        <span style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;height:18px;padding:0 9px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-family:'Outfit','Noto Sans SC',sans-serif;">观赛 ${dailyWatchHours}h</span>
+                        <span style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;height:18px;padding:0 9px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-family:'Outfit','Noto Sans SC',sans-serif;">醒后 ${_afterStateText}</span>
+                        <span style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;height:18px;padding:0 9px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-family:'Outfit','Noto Sans SC',sans-serif;">收录 ${_matchEntries.length}场</span>
                     </div>
 
                     ${_streakLine ? `<div style="text-align:center; padding:0 16px 6px; font-size:8.5px; color:rgba(255,255,255,0.28); position:relative; z-index:10;">${_streakLine}</div>` : ''}
@@ -6035,7 +6035,7 @@ const CUSTOM_MATCH_ADVICE = {
                         </div>
                         <div style="text-align:right;">
                             <div style="font-size:7px; color:rgba(255,255,255,0.18); font-family:'Outfit',sans-serif; letter-spacing:0.5px; margin-bottom:6px;">NO.2026-NIGHTOWL · 夜啾</div>
-                            <div style="font-size:8px; color:rgba(255,255,255,0.5); font-weight:900; text-transform:uppercase; border:1.5px solid rgba(255,255,255,0.28); border-radius:4px; padding:3px 8px; transform:rotate(-8deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.7px; box-shadow:0 0 6px rgba(255,255,255,0.08);">${_archiveLane.stamp}</div>
+                            <div style="font-size:8px; color:rgba(255,255,255,0.5); font-weight:900; text-transform:uppercase; border:1.5px solid rgba(255,255,255,0.28); border-radius:4px; height:16px; padding:0 8px; box-sizing:border-box; transform:rotate(-8deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.7px; box-shadow:0 0 6px rgba(255,255,255,0.08);">${_archiveLane.stamp}</div>
                         </div>
                     </div>
                 </div>
@@ -6235,12 +6235,7 @@ const CUSTOM_MATCH_ADVICE = {
                                         <div style="font-size:7.5px; color:rgba(255,255,255,0.18); font-family:'Outfit',sans-serif; letter-spacing:0.06em;">夜啾 NIGHTBIRD · 2026</div>
                                     </div>
                                     <div style="display:flex; align-items:center; justify-content:flex-end;">
-                                        <div style="font-size:8px; color:rgba(255,255,255,0.66); font-weight:900; text-transform:uppercase;
-                                                    border:1.5px solid rgba(255,255,255,0.42); border-radius:5px; padding:3px 7px;
-                                                    transform:rotate(-8deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em;
-                                                    box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06);">
-                                            APPROVED
-                                        </div>
+                                        <div style="font-size:8px; color:rgba(255,255,255,0.66); font-weight:900; text-transform:uppercase; border:1.5px solid rgba(255,255,255,0.42); border-radius:5px; height:16px; padding:0 7px; box-sizing:border-box; transform:rotate(-8deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06);">APPROVED</div>
                                     </div>
                                 </div>
                             </div>
@@ -10559,7 +10554,7 @@ function closeEmergencyModal() {
             const highlightsCount = decisionRecords.filter(item => item.record.watchType === 'highlights').length;
             const sleptCount = decisionRecords.filter(item => item.record.watchType === 'slept').length;
             const choiceIndex = totalDecisions
-                ? Math.round(Math.min(100, ((highlightsCount * 1 + sleptCount * 0.65 + halfCount * 0.55) / totalDecisions) * 100))
+                                ? Math.round(Math.min(100, ((highlightsCount * 1 + sleptCount * 0.65 + halfCount * 0.55) / totalDecisions) * 100))
                 : 0;
             const rationalIndex = choiceIndex; // compatibility with terminal persona progress.
 
@@ -11817,9 +11812,7 @@ function generateDailyStatus(checkins, dateStr) {
                                         <div style="font-size:30px; line-height:1; margin:4px 0 8px;">${persona.emoji}</div>
                                         <div style="font-size:24px; font-weight:900; color:#ffffff; line-height:1.15; letter-spacing:-0.02em;">${persona.name}</div>
                                         <div style="font-size:10.5px; color:rgba(255,255,255,0.42); line-height:1.7; max-width:260px; margin-top:9px;">${persona.desc}</div>
-                                        <div class="persona-stamp" style="margin-top:16px; font-size:9px; color:rgba(255,255,255,0.76); font-weight:900; text-transform:uppercase; border:2px solid rgba(255,255,255,0.38); border-radius:5px; padding:4px 10px; display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06);">
-                                            CERTIFIED
-                                        </div>
+                                        <div class="persona-stamp" style="margin-top:16px; font-size:9px; color:rgba(255,255,255,0.76); font-weight:900; text-transform:uppercase; border:2px solid rgba(255,255,255,0.38); border-radius:5px; height:19px; padding:0 10px; box-sizing:border-box; display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06);">CERTIFIED</div>
                                     </div>
                                     <div style="height:2px; background:${hostRibbon}; opacity:0.78;"></div>
                                 </div>
@@ -11936,9 +11929,7 @@ function generateDailyStatus(checkins, dateStr) {
                                     ${personaEvidenceHTML}
                                 </details>
 
-                                <div class="persona-stamp" style="position:absolute; right:18px; bottom:20px; font-size:9px; color:rgba(255,255,255,0.62); font-weight:900; text-transform:uppercase; border:2px solid rgba(255,255,255,0.34); border-radius:5px; padding:4px 10px; transform:rotate(-7deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06); pointer-events:none;">
-                                    CERTIFIED
-                                </div>
+                                <div class="persona-stamp" style="position:absolute; right:18px; bottom:20px; font-size:9px; color:rgba(255,255,255,0.62); font-weight:900; text-transform:uppercase; border:2px solid rgba(255,255,255,0.34); border-radius:5px; height:19px; padding:0 10px; box-sizing:border-box; transform:rotate(-7deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px rgba(255,255,255,0.10), inset 0 0 6px rgba(255,255,255,0.06); pointer-events:none;">CERTIFIED</div>
                             </div>
 
                             <div style="height:2px; background:${hostRibbon}; opacity:0.82;"></div>
@@ -13431,10 +13422,10 @@ function generateDailyStatus(checkins, dateStr) {
                     { label: 'OFF', title: '看完断网回收', desc: routeWrapText, color: hostAccents.green }
                 ];
             const routeStepChipsHTML = mapSteps.map((step) => `
-                <span style="display:inline-flex; align-items:center; gap:5px; min-width:0; max-width:100%; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.025); border-radius:999px; padding:5px 8px; line-height:1.35;">
-                    <span style="width:5px; height:5px; border-radius:999px; background:${step.color}; box-shadow:0 0 10px ${step.color}55; flex-shrink:0;"></span>
-                    <span style="font-size:7.2px; color:rgba(255,255,255,0.52); font-family:monospace; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; flex-shrink:0; line-height:1.35;">${safe(step.label)}</span>
-                    <span style="font-size:8px; color:rgba(255,255,255,0.72); font-weight:900; white-space:nowrap; line-height:1.35;">${safe(step.title)}</span>
+                <span style="display:inline-flex; align-items:center; height:18px; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.025); border-radius:999px; padding:0 8px; box-sizing:border-box; line-height:1; gap:5px; min-width:0; max-width:100%;">
+                    <span style="width:5px; height:5px; border-radius:999px; background:${step.color}; box-shadow:0 0 10px ${step.color}55; flex-shrink:0; display:inline-block;"></span>
+                    <span style="font-size:7.5px; color:rgba(255,255,255,0.52); font-family:'Outfit',sans-serif; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; flex-shrink:0; line-height:1; display:inline-block;">${safe(step.label)}</span>
+                    <span style="font-size:8px; color:rgba(255,255,255,0.72); font-family:'Noto Sans SC','Outfit',sans-serif; font-weight:900; white-space:nowrap; line-height:1; display:inline-block;">${safe(step.title)}</span>
                 </span>
             `).join('');
             const shareCTA = realtimeCount === 0 ? '把体力留给下一场' : '把热爱花在值得看的那一场';
@@ -13550,9 +13541,7 @@ function generateDailyStatus(checkins, dateStr) {
                                         <div style="font-size:6.5px; color:rgba(255,255,255,0.22); line-height:1.35; margin-top:2px;">扫码生成你的护航卡</div>
                                     </div>
                                 </div>
-                                <div style="font-size:8px; color:${accentColor}; font-weight:900; text-transform:uppercase; border:1.5px solid ${accentColor}; border-radius:999px; padding:4px 10px; transform:rotate(-5deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px ${accentColor}42, inset 0 0 8px ${accentColor}16; background:rgba(0,0,0,0.25);">
-                                    ${stampText}
-                                </div>
+                                <div style="font-size:8px; color:${accentColor}; font-weight:900; text-transform:uppercase; border:1.5px solid ${accentColor}; border-radius:999px; height:18px; padding:0 10px; box-sizing:border-box; transform:rotate(-5deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px ${accentColor}42, inset 0 0 8px ${accentColor}16; background:rgba(0,0,0,0.25);">${stampText}</div>
                             </div>
                         </div>
                         <div style="height:2px; background:${hostRibbon}; opacity:0.82;"></div>
@@ -13612,6 +13601,8 @@ function generateDailyStatus(checkins, dateStr) {
                 card.style.zoom = scale.toFixed(5);
                 card.style.margin = '0 auto';
             }
+            // 强行把 wrapper 的高度设为缩放后的卡片高度，避免 webkit/blink zoom 布局残留多余高度
+            wrapper.style.height = Math.round(cardHeight * scale) + 'px';
         }
 
         window.addEventListener('resize', () => {
@@ -13625,6 +13616,9 @@ function generateDailyStatus(checkins, dateStr) {
             const card = document.getElementById(cardId);
             const btn  = document.getElementById(btnId);
             if (!card) { showToast('没有找到可生成的海报卡片'); return; }
+
+            openPosterShareSheet(cardId, fileName);
+            return;
 
             // loading 状态
             const originalHTML = btn ? btn.innerHTML : '';
@@ -13884,7 +13878,145 @@ function generateDailyStatus(checkins, dateStr) {
             }
         }
 
+        function copyCanvasContentToClone(source, clone) {
+            const sourceCanvases = Array.from(source.querySelectorAll('canvas'));
+            const cloneCanvases = Array.from(clone.querySelectorAll('canvas'));
+            sourceCanvases.forEach((sourceCanvas, index) => {
+                const cloneCanvas = cloneCanvases[index];
+                if (!cloneCanvas || !sourceCanvas.width || !sourceCanvas.height) return;
+                cloneCanvas.width = sourceCanvas.width;
+                cloneCanvas.height = sourceCanvas.height;
+                cloneCanvas.style.width = sourceCanvas.style.width || `${sourceCanvas.width}px`;
+                cloneCanvas.style.height = sourceCanvas.style.height || `${sourceCanvas.height}px`;
+                const ctx = cloneCanvas.getContext('2d');
+                if (ctx) ctx.drawImage(sourceCanvas, 0, 0);
+            });
+        }
+
+        function preparePosterShareClone(card, cardId) {
+            const clone = card.cloneNode(true);
+            clone.removeAttribute('id');
+            clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            clone.style.width = '360px';
+            clone.style.maxWidth = 'none';
+            clone.style.minWidth = '360px';
+            clone.style.zoom = '1';
+            clone.style.transform = 'none';
+            clone.style.transformOrigin = 'top center';
+            clone.style.margin = '0';
+            clone.style.pointerEvents = 'none';
+            clone.style.flexShrink = '0';
+
+            if (cardId === 'poster-card') {
+                Array.from(clone.children).forEach(child => {
+                    const styleText = child.getAttribute('style') || '';
+                    if (/flex\s*:\s*1/.test(styleText)) {
+                        child.style.display = 'none';
+                        child.style.flex = '0 0 0';
+                    }
+                });
+                clone.style.height = 'auto';
+                clone.style.minHeight = '0';
+                clone.style.aspectRatio = 'auto';
+            } else {
+                clone.style.height = '640px';
+                clone.style.minHeight = '640px';
+            }
+
+            copyCanvasContentToClone(card, clone);
+            return clone;
+        }
+
+        function mountPosterClonePreview(slot, card, cardId) {
+            const clone = preparePosterShareClone(card, cardId);
+            const holder = document.createElement('div');
+            holder.style.cssText = 'width:360px; transform-origin:top center; will-change:transform;';
+            holder.appendChild(clone);
+            slot.innerHTML = '';
+            slot.appendChild(holder);
+
+            requestAnimationFrame(() => {
+                const measuredHeight = Math.max(1, Math.ceil(clone.scrollHeight || clone.getBoundingClientRect().height || 640));
+                const maxPreviewWidth = Math.min(window.innerWidth - 48, 342);
+                const maxPreviewHeight = Math.min(window.innerHeight * 0.58, 570);
+                const scale = Math.min(1, maxPreviewWidth / 360, maxPreviewHeight / measuredHeight);
+                holder.style.height = `${measuredHeight}px`;
+                holder.style.transform = `scale(${scale})`;
+                slot.style.height = `${Math.ceil(measuredHeight * scale)}px`;
+            });
+        }
+
+        async function renderPosterCardDataUrl(cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) throw new Error('没有找到海报卡片');
+            const renderRoot = document.createElement('div');
+            renderRoot.style.cssText = 'position:fixed; left:-9999px; top:0; width:360px; min-height:1px; background:#000; z-index:-1; overflow:visible; pointer-events:none;';
+            const clone = preparePosterShareClone(card, cardId);
+            renderRoot.appendChild(clone);
+            document.body.appendChild(renderRoot);
+
+            try {
+                const imgs = Array.from(clone.querySelectorAll('img'));
+                await Promise.all(imgs.map(img => {
+                    if (img.complete && img.naturalWidth) return Promise.resolve();
+                    return new Promise(resolve => {
+                        img.onload = resolve;
+                        img.onerror = resolve;
+                    });
+                }));
+                await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+                const canvas = await html2canvas(clone, {
+                    backgroundColor: '#000000',
+                    scale: Math.min(2.4, window.devicePixelRatio || 2),
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    imageTimeout: 3000
+                });
+                return canvas.toDataURL('image/png');
+            } finally {
+                renderRoot.remove();
+            }
+        }
+
+        function openPosterShareSheetV2(cardId, fileName, dataUrl) {
+            const card = document.getElementById(cardId);
+            if (!card) { showToast('没有找到可分享的海报卡片'); return; }
+
+            closePosterShareSheet();
+            const payload = buildPosterSharePayload(card, fileName);
+            const shareId = "share-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+            window.__yejiuPosterShares = window.__yejiuPosterShares || {};
+            window.__yejiuPosterShares[shareId] = { cardId, fileName, payload, dataUrl };
+
+            const iconSave = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+            const iconShare = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4"/><path d="m15.4 6.5-6.8 4"/></svg>`;
+            const iconCopy = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
+
+            const modal = document.createElement('div');
+            modal.id = 'poster-share-sheet';
+            modal.style.cssText = 'position:fixed; inset:0; z-index:10010; background:rgba(0,0,0,0.78); backdrop-filter:blur(14px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px 18px max(18px, env(safe-area-inset-bottom)); box-sizing:border-box;';
+            modal.innerHTML = `
+                <div class="poster-share-preview-slot" style="width:100%; display:flex; align-items:flex-start; justify-content:center; overflow:hidden; border-radius:22px; background:rgba(0,0,0,0.2); box-shadow:0 24px 70px rgba(0,0,0,0.62);"></div>
+                <div style="width:100%; max-width:390px; display:grid; grid-template-columns:repeat(4,1fr); gap:18px 12px; justify-items:center; margin-top:22px;">
+                    ${posterShareButtonHTML(shareId, 'saveImage', '保存到本地', iconSave, 'linear-gradient(135deg, #7c3aed, #4f46e5)')}
+                    ${posterShareButtonHTML(shareId, 'system', '系统分享', iconShare, 'linear-gradient(135deg, #27272a, #111113)')}
+                    ${posterShareButtonHTML(shareId, 'wechat', '微信', '<span style="font-size:20px;line-height:1;">微</span>', 'linear-gradient(135deg, #22c55e, #16a34a)')}
+                    ${posterShareButtonHTML(shareId, 'moments', '朋友圈', '<span style="font-size:20px;line-height:1;">朋</span>', 'linear-gradient(135deg, #14b8a6, #0ea5e9)')}
+                    ${posterShareButtonHTML(shareId, 'qq', 'QQ', '<span style="font-size:20px;line-height:1;">Q</span>', 'linear-gradient(135deg, #38bdf8, #2563eb)')}
+                    ${posterShareButtonHTML(shareId, 'qqzone', 'QQ空间', '<span style="font-size:20px;line-height:1;">★</span>', 'linear-gradient(135deg, #facc15, #f59e0b)')}
+                    ${posterShareButtonHTML(shareId, 'copyText', '复制文案', iconCopy, 'linear-gradient(135deg, #71717a, #27272a)')}
+                </div>
+                <button type="button" onclick="closePosterShareSheet()" style="width:48px; height:48px; border-radius:999px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.08); color:#fff; font-size:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:22px; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">×</button>
+            `;
+            document.body.appendChild(modal);
+            const previewSlot = modal.querySelector('.poster-share-preview-slot');
+            if (previewSlot) mountPosterClonePreview(previewSlot, card, cardId);
+        }
+
         function openPosterShareSheet(cardId, fileName, dataUrl) {
+            openPosterShareSheetV2(cardId, fileName, dataUrl);
+            return;
             const card = document.getElementById(cardId);
             if (!card) { showToast('没有找到可分享的海报卡片'); return; }
 
@@ -13936,7 +14068,8 @@ function generateDailyStatus(checkins, dateStr) {
         async function sharePosterVia(shareId, channel) {
             const shareData = window.__yejiuPosterShares?.[shareId];
             if (!shareData) { showToast('分享内容已失效，请重新打开'); return; }
-            const { payload, fileName, dataUrl } = shareData;
+            const { payload, fileName } = shareData;
+            let dataUrl = shareData.dataUrl;
 
             if (channel === 'system') {
                 if (navigator.share) {
@@ -13953,6 +14086,17 @@ function generateDailyStatus(checkins, dateStr) {
             }
 
             if (channel === 'saveImage') {
+                if (!dataUrl) {
+                    showToast('正在生成海报图片...');
+                    try {
+                        dataUrl = await renderPosterCardDataUrl(shareData.cardId);
+                        shareData.dataUrl = dataUrl;
+                    } catch (renderErr) {
+                        console.warn('Render poster image failed:', renderErr);
+                        showToast('生成图片失败，请稍后再试');
+                        return;
+                    }
+                }
                 if (!dataUrl) { showToast('没有找到可保存的海报图片'); return; }
                 showToast('正在调起保存...');
                 try {
