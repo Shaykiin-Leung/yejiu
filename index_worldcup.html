@@ -13562,7 +13562,7 @@ function generateDailyStatus(checkins, dateStr) {
             // loading 状态
             const originalHTML = btn ? btn.innerHTML : '';
             if (btn) {
-                btn.innerHTML = '<span style="margin-right:6px">⏳</span> 正在生成今日海报...';
+                btn.innerHTML = '<span style="margin-right:6px">⏳</span> 正在生成海报...';
                 btn.disabled = true;
                 btn.style.opacity = '0.7';
             }
@@ -13606,9 +13606,27 @@ function generateDailyStatus(checkins, dateStr) {
             const originalSrcs = [];
             const imgs = Array.from(card.querySelectorAll('img'));
 
-            // 异步 Base64 转换函数（带 600ms 严格超时 abort 控制）
-            async function toBase64(url) {
+            // 异步 Base64 转换函数 (Canvas 优先 + Fetch 兜底，带 600ms 严格超时)
+            async function toBase64(img) {
+                const url = img.src;
                 if (!url || url.startsWith('data:')) return url;
+                
+                // 1. 尝试使用 Canvas 获取内存中已加载的图片 (0ms 且无跨域限制)
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth || img.width || 300;
+                    canvas.height = img.naturalHeight || img.height || 300;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const base64 = canvas.toDataURL('image/png');
+                    if (base64 && base64.startsWith('data:image')) {
+                        return base64;
+                    }
+                } catch (canvasErr) {
+                    console.warn('Canvas conversion failed, falling back to fetch:', canvasErr);
+                }
+
+                // 2. Fetch 网络获取与转换
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 600);
                 try {
@@ -13623,7 +13641,7 @@ function generateDailyStatus(checkins, dateStr) {
                     });
                 } catch (e) {
                     clearTimeout(timeoutId);
-                    console.warn('Failed to convert image to base64:', url, e);
+                    console.warn('Failed to convert image to base64 via fetch:', url, e);
                     return url;
                 }
             }
@@ -13641,12 +13659,12 @@ function generateDailyStatus(checkins, dateStr) {
                             await Promise.all(imgs.map(async img => {
                                 const originalSrc = img.src;
                                 originalSrcs.push({ img, src: originalSrc });
-                                const base64 = await toBase64(originalSrc);
+                                const base64 = await toBase64(img);
                                 img.src = base64;
                             }));
 
                             // 2. 等待 DOM 更新
-                            await new Promise(r => setTimeout(r, 100));
+                            await new Promise(r => setTimeout(r, 120));
 
                             // 3. 运行 html2canvas
                             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -13658,7 +13676,7 @@ function generateDailyStatus(checkins, dateStr) {
                                 useCORS: true,
                                 allowTaint: true,
                                 logging: false,
-                                imageTimeout: 1000
+                                imageTimeout: 1500
                             });
                             
                             const dUrl = c.toDataURL('image/png');
@@ -13718,37 +13736,25 @@ function generateDailyStatus(checkins, dateStr) {
             window.__yejiuPosterShares = window.__yejiuPosterShares || {};
             window.__yejiuPosterShares[shareId] = { cardId, fileName, payload, dataUrl };
 
-            // SVGs for social platforms matching Figure 3 style
-            const downloadIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
-            const wechatIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>`;
-            const momentsIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"/></svg>`;
-            const qqIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
-            const qqZoneIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
-            const copyIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
-            const linkIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
+            // Download icon SVG matching Figure 3
+            const downloadIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
 
             const modal = document.createElement('div');
             modal.id = 'poster-share-sheet';
-            modal.style.cssText = 'position:fixed; inset:0; z-index:10010; background:rgba(0,0,0,0.78); backdrop-filter:blur(12px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px;';
+            modal.style.cssText = 'position:fixed; inset:0; z-index:10010; background:rgba(0,0,0,0.8); backdrop-filter:blur(12px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px;';
             modal.innerHTML = `
                 <!-- Card Preview (Aspect 9/16, centered) -->
                 <div style="width:100%; max-width:280px; height:min(54vh, 480px); border-radius:20px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.6); background:#050505; border:1px solid rgba(255,255,255,0.08);">
                     <img src="${dataUrl}" style="width:100%; height:100%; object-fit:contain; display:block; pointer-events:auto;" alt="夜啾分享卡">
                 </div>
 
-                <!-- Sharing Platform Buttons (Circular, Colorful Gradients) -->
-                <div style="width:100%; max-width:360px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:20px; padding:0 8px;">
-                    ${posterShareButtonHTML(shareId, 'saveImage', '保存本地', downloadIcon, 'linear-gradient(135deg, #7c3aed, #4f46e5)')}
-                    ${posterShareButtonHTML(shareId, 'wechat', '微信', wechatIcon, 'linear-gradient(135deg, #22c55e, #16a34a)')}
-                    ${posterShareButtonHTML(shareId, 'moments', '朋友圈', momentsIcon, 'linear-gradient(135deg, #0d9488, #0f766e)')}
-                    ${posterShareButtonHTML(shareId, 'qq', 'QQ', qqIcon, 'linear-gradient(135deg, #0ea5e9, #2563eb)')}
-                    ${posterShareButtonHTML(shareId, 'qqzone', 'QQ空间', qqZoneIcon, 'linear-gradient(135deg, #f59e0b, #d97706)')}
-                    ${posterShareButtonHTML(shareId, 'copyText', '复制文案', copyIcon, 'linear-gradient(135deg, #ec4899, #db2777)')}
-                    ${posterShareButtonHTML(shareId, 'copyLink', '复制链接', linkIcon, 'linear-gradient(135deg, #64748b, #475569)')}
+                <!-- Only Save button, matching figure 3 style -->
+                <div style="width:100%; max-width:360px; display:flex; justify-content:center; margin-top:24px;">
+                    ${posterShareButtonHTML(shareId, 'saveImage', '保存到本地', downloadIcon, 'linear-gradient(135deg, #7c3aed, #4f46e5)')}
                 </div>
 
                 <!-- Close Button (X at the bottom) -->
-                <button type="button" onclick="closePosterShareSheet()" style="width:40px; height:40px; border-radius:999px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.08); color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:22px; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">×</button>
+                <button type="button" onclick="closePosterShareSheet()" style="width:40px; height:40px; border-radius:999px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.08); color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:24px; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">×</button>
             `;
             document.body.appendChild(modal);
         }
@@ -13761,10 +13767,10 @@ function generateDailyStatus(checkins, dateStr) {
         function posterShareButtonHTML(shareId, channel, label, iconHtml, gradient) {
             return `
                 <div style="text-align:center; flex:0 0 auto;">
-                    <button type="button" onclick="sharePosterVia('${shareId}', '${channel}')" style="width:44px; height:44px; border-radius:999px; border:none; background:${gradient}; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.3); margin:0 auto; cursor:pointer; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.92)'" onmouseup="this.style.transform='scale(1)'">
+                    <button type="button" onclick="sharePosterVia('${shareId}', '${channel}')" style="width:52px; height:52px; border-radius:999px; border:none; background:${gradient}; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,0.4); margin:0 auto; cursor:pointer; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
                         ${iconHtml}
                     </button>
-                    <div style="font-size:9.5px; color:rgba(255,255,255,0.78); margin-top:5px; font-weight:500; white-space:nowrap; font-family:'Outfit','Noto Sans SC',sans-serif;">${label}</div>
+                    <div style="font-size:11px; color:rgba(255,255,255,0.85); margin-top:6px; font-weight:700; white-space:nowrap; font-family:'Outfit','Noto Sans SC',sans-serif; letter-spacing:0.04em;">${label}</div>
                 </div>
             `;
         }
