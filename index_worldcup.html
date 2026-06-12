@@ -5201,6 +5201,18 @@ const CUSTOM_MATCH_ADVICE = {
             return `<div style="width:96px; height:96px; margin:0 auto; display:flex; align-items:center; justify-content:center; position:relative; mix-blend-mode: screen;"><img src="${src}" ${crossOriginAttr} class="w-full h-full object-contain animate-fade-in" alt="Diagnosis Mascot" onerror="this.onerror=null; this.src='${fallbackSrc}'; handleImageLoadError(this);" style="width:100%;height:100%;object-fit:contain; -webkit-mask-image:radial-gradient(circle at center, black 65%, transparent 100%); mask-image:radial-gradient(circle at center, black 65%, transparent 100%);"></div>`;
         }
 
+        function formatStatValueHTML(val) {
+            const safe = (v) => {
+                const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+                return String(v ?? '').replace(/[&<>"']/g, ch => map[ch]);
+            };
+            const match = String(val).match(/^([0-9.]+)([\u4e00-\u9fa5])$/);
+            if (match) {
+                return `<span style="font-family:'Outfit',-apple-system,BlinkMacSystemFont,sans-serif; font-weight:900;">${safe(match[1])}</span><span style="font-family:'Noto Sans SC',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif; font-weight:900; font-size:0.68em; margin-left:1px;">${safe(match[2])}</span>`;
+            }
+            return `<span style="font-family:'Noto Sans SC',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif; font-weight:900;">${safe(val)}</span>`;
+        }
+
 
                 // ── 战损报告 HTML 生成引擎（适配弹窗与 Tab 页面嵌入） ──
         // ── 战损报告 HTML 生成引擎（适配弹窗与 Tab 页面嵌入） ──
@@ -5895,11 +5907,11 @@ const CUSTOM_MATCH_ADVICE = {
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
                         <div style="min-width:0;">
                             <div style="font-size:7px;font-weight:900;color:rgba(255,255,255,0.26);font-family:monospace;letter-spacing:0.13em;text-transform:uppercase;margin-bottom:5px;">TODAY KEY RECORD</div>
-                            <div style="font-size:13px;font-weight:900;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${_featuredEntry.teamA} vs ${_featuredEntry.teamB}</div>
+                            <div style="font-size:13px;font-weight:900;color:#fff;line-height:1.35;white-space:nowrap;">${_featuredEntry.teamA} vs ${_featuredEntry.teamB}</div>
                             <div style="font-size:8px;color:rgba(255,255,255,0.36);margin-top:4px;">${_featuredEntry.timeStr} · ${reasonLabel}${_extraArchiveCount ? ` · 另收录 ${_extraArchiveCount} 场` : ''}</div>
                         </div>
                         <div style="text-align:right;flex-shrink:0;">
-                            <div style="font-size:18px;font-weight:900;color:#fff;font-family:monospace;line-height:1;">${_featuredEntry.scoreStr}</div>
+                            <div style="font-size:18px;font-weight:900;color:#fff;font-family:'Outfit',sans-serif;line-height:1.25;">${_featuredEntry.scoreStr}</div>
                             <div style="width:7px;height:7px;border-radius:999px;background:${watchStyle.main};box-shadow:0 0 12px ${watchStyle.main}88;margin:7px 0 0 auto;"></div>
                         </div>
                     </div>
@@ -5951,7 +5963,7 @@ const CUSTOM_MATCH_ADVICE = {
             return `
                 ${modalHeaderHTML}
 
-                <div id="poster-card" style="background:#080808; border-radius:22px; overflow:hidden; position:relative; font-family:'Noto Sans SC','Outfit',sans-serif; width:360px; height:640px; box-sizing:border-box; border:1px solid rgba(255,255,255,0.095); box-shadow:0 30px 80px rgba(0,0,0,0.98); display:flex; flex-direction:column; flex-shrink:0;">
+                <div id="poster-card" style="background:#080808; border-radius:22px; overflow:hidden; position:relative; font-family:'Noto Sans SC', 'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; line-height:1.4; width:360px; height:640px; box-sizing:border-box; border:1px solid rgba(255,255,255,0.095); box-shadow:0 30px 80px rgba(0,0,0,0.98); display:flex; flex-direction:column; flex-shrink:0;">
                     <!-- 底纹层：微点阵 + 顶部径向光晕 -->
                     <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px); background-size:20px 20px; pointer-events:none; z-index:0;"></div>
                     <div style="position:absolute; inset:0; background:radial-gradient(circle at 50% 0%, ${_accentGlow}, transparent 65%); pointer-events:none; z-index:0;"></div>
@@ -5979,7 +5991,7 @@ const CUSTOM_MATCH_ADVICE = {
                                 <span style="display:inline-flex;gap:3px;">${getHostDotsHTML(3, 3, 0.72)}</span>
                                 <span style="font-size:7px;font-weight:900;color:rgba(255,255,255,0.68);letter-spacing:0.12em;text-transform:uppercase;font-family:monospace;">${_archiveLane.label} · POST MATCH</span>
                             </div>
-                            <div style="font-size:26px; font-weight:900; color:#ffffff; letter-spacing:-0.03em; line-height:1.02; margin-bottom:4px;">${diagnosisTag}</div>
+                            <div style="font-size:26px; font-weight:900; color:#ffffff; letter-spacing:-0.03em; line-height:1.2; margin-bottom:4px;">${diagnosisTag}</div>
                             ${milestoneTag ? `<div style="display:inline-block; font-size:8px; color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:2px 8px; margin-bottom:4px; letter-spacing:0.05em; font-family:monospace;">${milestoneTag}</div>` : ''}
                             <div style="font-size:10px; color:rgba(255,255,255,0.38); line-height:1.45; max-width:250px; margin:0 auto;">${diagnosisTitle}</div>
                         </div>
@@ -6004,10 +6016,10 @@ const CUSTOM_MATCH_ADVICE = {
                     </div>
 
                     <!-- ⑤ 状态小票：比大数据卡更轻，更像晒卡 -->
-                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px 6px;position:relative;z-index:10;">
-                        <span style="font-size:8px;font-weight:900;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;">观赛 ${dailyWatchHours}h</span>
-                        <span style="font-size:8px;font-weight:900;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;">醒后 ${_afterStateText}</span>
-                        <span style="font-size:8px;font-weight:900;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;">收录 ${_matchEntries.length}场</span>
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px 6px;position:relative;z-index:10;line-height:1.35;">
+                        <span style="font-size:8px;font-weight:900;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;line-height:1.35;">观赛 ${dailyWatchHours}h</span>
+                        <span style="font-size:8px;font-weight:900;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;line-height:1.35;">醒后 ${_afterStateText}</span>
+                        <span style="font-size:8px;font-weight:900;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;line-height:1.35;">收录 ${_matchEntries.length}场</span>
                     </div>
 
                     ${_streakLine ? `<div style="text-align:center; padding:0 16px 6px; font-size:8.5px; color:rgba(255,255,255,0.28); position:relative; z-index:10;">${_streakLine}</div>` : ''}
@@ -6135,7 +6147,7 @@ const CUSTOM_MATCH_ADVICE = {
                     </div>
 
                     <div class="poster-scale-wrapper" style="width:100%; overflow:hidden; display:flex; justify-content:center; align-items:center;">
-                        <div id="persona-poster-card" style="background:#080808; border-radius:24px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Noto Sans SC','Outfit',sans-serif; width:360px; height:640px; border:1px solid rgba(255,255,255,0.12); display:flex; flex-direction:column; flex-shrink:0;">
+                        <div id="persona-poster-card" style="background:#080808; border-radius:24px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Noto Sans SC', 'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; line-height:1.4; width:360px; height:640px; border:1px solid rgba(255,255,255,0.12); display:flex; flex-direction:column; flex-shrink:0;">
                             <!-- 顶部 persona 色扫光线 -->
                             <div style="height:3px; background:${hostRibbon};"></div>
 
@@ -6178,7 +6190,7 @@ const CUSTOM_MATCH_ADVICE = {
 
                                 <!-- 人格名 - 主视觉 -->
                                 <div style="text-align:center; margin-bottom:2px;">
-                                    <div style="font-size:24px; font-weight:900; color:#ffffff; letter-spacing:-0.03em; line-height:1.1;">${persona.name}</div>
+                                    <div style="font-size:24px; font-weight:900; color:#ffffff; letter-spacing:-0.03em; line-height:1.25;">${persona.name}</div>
                                 </div>
 
                                 <!-- 描述 -->
@@ -6191,9 +6203,9 @@ const CUSTOM_MATCH_ADVICE = {
                                     <div style="position:absolute; top:0; left:18px; right:18px; height:1px; background:${hostRibbon}; opacity:0.68;"></div>
                                     <div style="font-size:8px; color:rgba(255,255,255,0.62); font-weight:900; letter-spacing:0.1em; font-family:monospace; text-transform:uppercase; margin-bottom:4px;">你的 2026 世界杯旅程</div>
                                     <div style="font-size:11px; color:rgba(255,255,255,0.55); line-height:1.8; font-weight:500;">
-                                        陪伴了 <span style="color:#ffffff; font-weight:900; font-size:13px;">${subbedCount}</span> 场精彩赛事
-                                        &nbsp;·&nbsp; 熬夜 <span style="color:#ffffff; font-weight:900; font-size:13px;">${dangerCount}</span> 天
-                                        &nbsp;·&nbsp; 恢复压力 <span style="color:#ffffff; font-weight:900; font-size:13px;">${sleepDebt % 1 === 0 ? sleepDebt : sleepDebt.toFixed(1)}h</span>
+                                        陪伴了 <span style="color:#ffffff; font-weight:900; font-size:13px; font-family:'Outfit',sans-serif;">${subbedCount}</span> 场精彩赛事
+                                        &nbsp;·&nbsp; 熬夜 <span style="color:#ffffff; font-weight:900; font-size:13px; font-family:'Outfit',sans-serif;">${dangerCount}</span> 天
+                                        &nbsp;·&nbsp; 恢复压力 <span style="color:#ffffff; font-weight:900; font-size:13px; font-family:'Outfit',sans-serif;">${sleepDebt % 1 === 0 ? sleepDebt : sleepDebt.toFixed(1)}h</span>
                                     </div>
                                 </div>
 
@@ -6203,7 +6215,7 @@ const CUSTOM_MATCH_ADVICE = {
                                         <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:9px 4px; text-align:center; position:relative; overflow:hidden;">
                                             <div style="position:absolute; top:0; left:9px; right:9px; height:1px; background:${hostRibbon}; opacity:0.42;"></div>
                                             <div style="position:absolute; bottom:0; left:0; right:0; height:${t.val}%; background:rgba(255,255,255,0.026);"></div>
-                                            <div style="font-size:17px; font-weight:900; color:#ffffff; line-height:1; position:relative;">${t.val}</div>
+                                            <div style="font-size:17px; font-weight:900; color:#ffffff; line-height:1.25; position:relative; font-family:'Outfit',sans-serif;">${t.val}</div>
                                             <div style="font-size:7px; color:rgba(255,255,255,0.3); margin-top:3px; font-weight:700; letter-spacing:0.04em; position:relative; line-height:1.3;">${t.label}</div>
                                         </div>
                                     `).join('')}
@@ -13377,7 +13389,7 @@ function generateDailyStatus(checkins, dateStr) {
                 ? ['今晚不硬熬', '醒后补剧情']
                 : (realtimeCount === 1 ? ['今晚只押一场', '其他都让路'] : ['今晚高投入', '看完就收束']);
             const posterTitleHTML = posterTitleLines.map((line, index) => `
-                <div style="line-height:1.02; ${index === 0 ? '' : 'margin-top:2px;'}">${safe(line)}</div>
+                <div style="line-height:1.25; ${index === 0 ? '' : 'margin-top:2px;'}">${safe(line)}</div>
             `).join('');
             const posterProof = realtimeCount === 0
                 ? `本轮 ${totalPlanCount || sourceRouteItems.length || 0} 场订阅，夜啾判断没有值得切碎睡眠的实时窗口。`
@@ -13398,7 +13410,7 @@ function generateDailyStatus(checkins, dateStr) {
             ].map(item => `
                 <div style="min-width:0; position:relative; padding:0 2px;">
                     <div style="height:2px; width:34px; border-radius:999px; background:${item.color}; opacity:0.78; margin:0 auto 8px; box-shadow:0 0 13px ${item.color}30;"></div>
-                    <span style="display:block; font-size:21px; font-weight:900; color:#ffffff; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;">${safe(item.value)}</span>
+                    <span style="display:block; font-size:21px; font-weight:900; color:#ffffff; line-height:1.25; text-align:center;">${formatStatValueHTML(item.value)}</span>
                     <span style="display:block; margin-top:5px; font-size:7px; color:rgba(255,255,255,0.35); font-weight:900; letter-spacing:0.12em; font-family:monospace; text-transform:uppercase;">${safe(item.label)}</span>
                 </div>
             `).join('');
@@ -13417,10 +13429,10 @@ function generateDailyStatus(checkins, dateStr) {
                     { label: 'OFF', title: '看完断网回收', desc: routeWrapText, color: hostAccents.green }
                 ];
             const routeStepChipsHTML = mapSteps.map((step) => `
-                <span style="display:inline-flex; align-items:center; gap:5px; min-width:0; max-width:100%; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.025); border-radius:999px; padding:5px 8px;">
+                <span style="display:inline-flex; align-items:center; gap:5px; min-width:0; max-width:100%; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.025); border-radius:999px; padding:5px 8px; line-height:1.35;">
                     <span style="width:5px; height:5px; border-radius:999px; background:${step.color}; box-shadow:0 0 10px ${step.color}55; flex-shrink:0;"></span>
-                    <span style="font-size:7.2px; color:rgba(255,255,255,0.52); font-family:monospace; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; flex-shrink:0;">${safe(step.label)}</span>
-                    <span style="font-size:8px; color:rgba(255,255,255,0.72); font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${safe(step.title)}</span>
+                    <span style="font-size:7.2px; color:rgba(255,255,255,0.52); font-family:monospace; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; flex-shrink:0; line-height:1.35;">${safe(step.label)}</span>
+                    <span style="font-size:8px; color:rgba(255,255,255,0.72); font-weight:900; white-space:nowrap; line-height:1.35;">${safe(step.title)}</span>
                 </span>
             `).join('');
             const shareCTA = realtimeCount === 0 ? '把体力留给下一场' : '把热爱花在值得看的那一场';
@@ -13470,14 +13482,14 @@ function generateDailyStatus(checkins, dateStr) {
                     </div>
 
                     <div class="poster-scale-wrapper" style="width:100%; overflow:hidden; display:flex; justify-content:center; align-items:center;">
-                        <div id="health-poster-card" style="background:linear-gradient(154deg, #070707 0%, #0d0d0d 42%, #050505 100%); border:1px solid rgba(255,255,255,0.13); border-radius:32px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Noto Sans SC','Outfit',sans-serif; width:360px; height:640px; display:flex; flex-direction:column; box-shadow:0 28px 90px rgba(0,0,0,0.66); flex-shrink:0;">
+                        <div id="health-poster-card" style="background:linear-gradient(154deg, #070707 0%, #0d0d0d 42%, #050505 100%); border:1px solid rgba(255,255,255,0.13); border-radius:32px; overflow:hidden; position:relative; box-sizing:border-box; font-family:'Noto Sans SC', 'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; line-height:1.4; width:360px; height:640px; display:flex; flex-direction:column; box-shadow:0 28px 90px rgba(0,0,0,0.66); flex-shrink:0;">
                         <div style="position:absolute; inset:0; background:${hostGlow}; opacity:0.72; pointer-events:none;"></div>
                         <div style="position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px), radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px); background-size:42px 42px, 42px 42px, 17px 17px; pointer-events:none; opacity:0.64;"></div>
                         <div style="position:absolute; left:18px; right:18px; top:0; height:2px; background:${hostRibbon}; opacity:0.85;"></div>
                         <div style="position:absolute; right:-78px; top:72px; width:190px; height:190px; border-radius:999px; border:1px solid rgba(255,255,255,0.055); background:radial-gradient(circle, ${accentColor}13 0, transparent 62%); pointer-events:none;"></div>
                         <div style="position:absolute; left:-58px; top:92px; width:160px; height:160px; border-radius:999px; background:radial-gradient(circle, ${hostAccents.red}12 0, transparent 68%); pointer-events:none;"></div>
                         <div style="position:absolute; right:-62px; top:168px; width:214px; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transform:rotate(-35deg); pointer-events:none;"></div>
-
+ 
                         <div style="padding:15px 18px 12px; position:relative; flex:1; display:flex; flex-direction:column; justify-content:space-between; min-height:0;">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:6px; flex-shrink:0;">
                                 <div>
@@ -13489,13 +13501,13 @@ function generateDailyStatus(checkins, dateStr) {
                                     <div style="display:flex; justify-content:flex-end; gap:5px; align-items:center; margin-top:7px; opacity:0.82;">${hostDotsHTML}</div>
                                 </div>
                             </div>
-
+ 
                             <div style="position:relative; flex:1; min-height:180px; padding:6px 10px; margin-bottom:6px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
                                 <div style="position:absolute; left:0; right:0; top:0; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);"></div>
                                 <div style="position:absolute; left:0; right:0; bottom:0; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);"></div>
                                 <div style="position:absolute; inset:-1px; background:radial-gradient(circle at 50% 13%, rgba(255,255,255,0.055) 0, transparent 32%), radial-gradient(circle at 50% 82%, ${accentColor}16 0, transparent 58%); pointer-events:none;"></div>
                                 <div style="position:relative;">${posterSignalPillHTML}</div>
-                                <div style="position:relative; margin-top:8px; font-size:27px; font-weight:900; color:#ffffff; line-height:1.05; letter-spacing:-0.05em; text-shadow:0 14px 34px rgba(0,0,0,0.62);">${posterTitleHTML}</div>
+                                <div style="position:relative; margin-top:8px; font-size:27px; font-weight:900; color:#ffffff; line-height:1.2; letter-spacing:-0.05em; text-shadow:0 14px 34px rgba(0,0,0,0.62);">${posterTitleHTML}</div>
                                 <div style="position:relative; margin-top:6px; font-size:9px; line-height:1.5; color:rgba(255,255,255,0.62); font-weight:900; max-width:266px; max-height:45px; overflow:hidden;">${safe(posterProofShort)}</div>
                                 <div style="position:relative; margin-top:8px; width:100%; max-width:270px; padding-top:2px;">
                                     <div style="font-size:10px; color:rgba(255,255,255,0.9); line-height:1.4; font-weight:900;">“${safe(posterQuote)}”</div>
@@ -13506,11 +13518,11 @@ function generateDailyStatus(checkins, dateStr) {
                                     </div>
                                 </div>
                             </div>
-
+ 
                             <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:0 2px 8px; padding:0 2px 7px; border-bottom:1px solid rgba(255,255,255,0.075); text-align:center; flex-shrink:0;">
                                 ${permitStatsHTML}
                             </div>
-
+ 
                             <div style="padding:0 2px 6px; margin-bottom:4px; flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center;">
                                 <div style="border:1px solid rgba(255,255,255,0.082); background:linear-gradient(145deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)); border-radius:22px; padding:8px 10px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.035);">
                                     <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
@@ -13518,7 +13530,7 @@ function generateDailyStatus(checkins, dateStr) {
                                         <div style="font-size:7px; color:rgba(255,255,255,0.34); font-family:monospace; white-space:nowrap;">RECOVERY ${safe(guideValue)}</div>
                                     </div>
                                     <div>
-                                        <div style="font-size:17px; color:#ffffff; font-weight:900; line-height:1; letter-spacing:-0.02em;">${safe(visualCommand)}</div>
+                                        <div style="font-size:17px; color:#ffffff; font-weight:900; line-height:1.25; letter-spacing:-0.02em; font-family:'Outfit',sans-serif;">${safe(visualCommand)}</div>
                                         <div style="margin-top:4px; font-size:10px; color:rgba(255,255,255,0.82); font-weight:900; line-height:1.3;">${safe(routeFocusTitle)}</div>
                                         <div style="margin-top:3px; font-size:8px; color:rgba(255,255,255,0.48); line-height:1.4; font-weight:800; max-height:25px; overflow:hidden;">${safe(routeFocusDesc)}</div>
                                     </div>
