@@ -5966,8 +5966,8 @@ const CUSTOM_MATCH_ADVICE = {
                     </div>
 
                         <!-- ① 角色大图（直接内联，mask 在 img 上，无 transform 干扰） -->
-                        <div style="padding:12px 16px 8px; text-align:center; position:relative; z-index:10;">
-                            <div style="width:148px; height:148px; margin:0 auto 10px; position:relative;">
+                        <div style="padding:10px 16px 6px; text-align:center; position:relative; z-index:10;">
+                            <div style="width:130px; height:130px; margin:0 auto 6px; position:relative;">
                                 <img src="${_mImgSrc}" ${crossOriginAttr}
                                      onerror="this.onerror=null; handleImageLoadError(this);"
                                     style="width:100%; height:100%; object-fit:contain; display:block;
@@ -5975,46 +5975,46 @@ const CUSTOM_MATCH_ADVICE = {
                                             -webkit-mask-image:radial-gradient(circle at center, black 50%, transparent 72%);
                                             mask-image:radial-gradient(circle at center, black 50%, transparent 72%);">
                             </div>
-                            <div style="display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.045);border-radius:999px;padding:4px 10px;margin-bottom:8px;">
+                            <div style="display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.045);border-radius:999px;padding:3px 8px;margin-bottom:5px;">
                                 <span style="display:inline-flex;gap:3px;">${getHostDotsHTML(3, 3, 0.72)}</span>
                                 <span style="font-size:7px;font-weight:900;color:rgba(255,255,255,0.68);letter-spacing:0.12em;text-transform:uppercase;font-family:monospace;">${_archiveLane.label} · POST MATCH</span>
                             </div>
-                            <div style="font-size:29px; font-weight:900; color:#ffffff; letter-spacing:-0.03em; line-height:1.02; margin-bottom:7px;">${diagnosisTag}</div>
-                            ${milestoneTag ? `<div style="display:inline-block; font-size:8px; color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:3px 10px; margin-bottom:6px; letter-spacing:0.05em; font-family:monospace;">${milestoneTag}</div>` : ''}
+                            <div style="font-size:26px; font-weight:900; color:#ffffff; letter-spacing:-0.03em; line-height:1.02; margin-bottom:4px;">${diagnosisTag}</div>
+                            ${milestoneTag ? `<div style="display:inline-block; font-size:8px; color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:2px 8px; margin-bottom:4px; letter-spacing:0.05em; font-family:monospace;">${milestoneTag}</div>` : ''}
                             <div style="font-size:10px; color:rgba(255,255,255,0.38); line-height:1.45; max-width:250px; margin:0 auto;">${diagnosisTitle}</div>
                         </div>
 
                     <!-- ② 诊断金句文案（替代指标条）-->
-                    <div style="padding:0 18px 10px; position:relative; z-index:10;">
-                        <div style="font-size:11px; color:rgba(255,255,255,0.68); line-height:1.55; text-align:center; font-style:italic; letter-spacing:0.01em; border-top:1px solid rgba(255,255,255,0.07); border-bottom:1px solid rgba(255,255,255,0.07); padding:9px 0;">“${_shareQuote}”</div>
-                        <div style="font-size:8px;color:rgba(255,255,255,0.32);text-align:center;margin-top:6px;font-weight:800;letter-spacing:0.02em;">${_archiveLane.shareLine}</div>
+                    <div style="padding:0 18px 8px; position:relative; z-index:10;">
+                        <div style="font-size:11px; color:rgba(255,255,255,0.68); line-height:1.55; text-align:center; font-style:italic; letter-spacing:0.01em; border-top:1px solid rgba(255,255,255,0.07); border-bottom:1px solid rgba(255,255,255,0.07); padding:6px 0;">“${_shareQuote}”</div>
+                        <div style="font-size:8px;color:rgba(255,255,255,0.32);text-align:center;margin-top:4px;font-weight:800;letter-spacing:0.02em;">${_archiveLane.shareLine}</div>
                     </div>
 
                     <!-- ③ 收录标签 -->
-                    <div style="padding:0 16px 10px; position:relative; z-index:10;">
+                    <div style="padding:0 16px 8px; position:relative; z-index:10;">
                         <div style="display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;">
                             ${_evidenceDotsHTML}
                         </div>
                     </div>
 
                     <!-- ④ 代表战役：只保留最能讲故事的一场 -->
-                    <div style="margin:0 16px 11px; padding:12px 13px; border:1px solid rgba(255,255,255,0.075); border-radius:16px; background:rgba(255,255,255,0.018); position:relative; z-index:10; overflow:hidden;">
+                    <div style="margin:0 16px 8px; padding:10px 12px; border:1px solid rgba(255,255,255,0.075); border-radius:16px; background:rgba(255,255,255,0.018); position:relative; z-index:10; overflow:hidden;">
                         <div style="position:absolute; top:0; left:14px; right:14px; height:1px; background:${_reportRibbon}; opacity:0.52;"></div>
                         ${_featuredMatchHTML}
                     </div>
 
                     <!-- ⑤ 状态小票：比大数据卡更轻，更像晒卡 -->
-                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px 10px;position:relative;z-index:10;">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px 6px;position:relative;z-index:10;">
                         <span style="font-size:8px;font-weight:900;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;">观赛 ${dailyWatchHours}h</span>
                         <span style="font-size:8px;font-weight:900;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;">醒后 ${_afterStateText}</span>
                         <span style="font-size:8px;font-weight:900;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);border-radius:999px;padding:5px 9px;">收录 ${_matchEntries.length}场</span>
                     </div>
 
-                    ${_streakLine ? `<div style="text-align:center; padding:0 16px 8px; font-size:8.5px; color:rgba(255,255,255,0.28); position:relative; z-index:10;">${_streakLine}</div>` : ''}
+                    ${_streakLine ? `<div style="text-align:center; padding:0 16px 6px; font-size:8.5px; color:rgba(255,255,255,0.28); position:relative; z-index:10;">${_streakLine}</div>` : ''}
                     <div style="flex:1;"></div>
 
                     <!-- ⑦ 底部 QR + APPROVED -->
-                    <div style="border-top:1px solid rgba(255,255,255,0.07); padding:10px 16px 12px; display:flex; align-items:center; justify-content:space-between; position:relative; z-index:10; margin-top:auto;">
+                    <div style="border-top:1px solid rgba(255,255,255,0.07); padding:8px 16px 10px; display:flex; align-items:center; justify-content:space-between; position:relative; z-index:10; margin-top:auto;">
                         <div>
                             <div id="report-qrcode-box" style="width:40px; height:40px; background:#fff; border-radius:5px; overflow:hidden; display:flex; align-items:center; justify-content:center;"></div>
                             <div style="font-size:6px; color:rgba(255,255,255,0.18); margin-top:3px; font-family:monospace; letter-spacing:0.5px;">扫码看图鉴</div>
@@ -13478,8 +13478,8 @@ function generateDailyStatus(checkins, dateStr) {
                         <div style="position:absolute; left:-58px; top:92px; width:160px; height:160px; border-radius:999px; background:radial-gradient(circle, ${hostAccents.red}12 0, transparent 68%); pointer-events:none;"></div>
                         <div style="position:absolute; right:-62px; top:168px; width:214px; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transform:rotate(-35deg); pointer-events:none;"></div>
 
-                        <div style="padding:17px 18px 15px; position:relative; flex:1; display:flex; flex-direction:column; justify-content:space-between; min-height:0;">
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:8px; flex-shrink:0;">
+                        <div style="padding:15px 18px 12px; position:relative; flex:1; display:flex; flex-direction:column; justify-content:space-between; min-height:0;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:6px; flex-shrink:0;">
                                 <div>
                                     <div style="font-size:9px; font-weight:900; color:rgba(255,255,255,0.66); letter-spacing:0.13em; text-transform:uppercase; font-family:monospace;">2026 FIFA WORLD CUP</div>
                                     <div style="font-size:7px; color:rgba(255,255,255,0.25); letter-spacing:0.1em; margin-top:2px; text-transform:uppercase; font-family:monospace;">YEJIU · WATCH HEALTH PASS</div>
@@ -13490,16 +13490,16 @@ function generateDailyStatus(checkins, dateStr) {
                                 </div>
                             </div>
 
-                            <div style="position:relative; flex:1; min-height:180px; padding:10px 10px; margin-bottom:8px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+                            <div style="position:relative; flex:1; min-height:180px; padding:6px 10px; margin-bottom:6px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
                                 <div style="position:absolute; left:0; right:0; top:0; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);"></div>
                                 <div style="position:absolute; left:0; right:0; bottom:0; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);"></div>
                                 <div style="position:absolute; inset:-1px; background:radial-gradient(circle at 50% 13%, rgba(255,255,255,0.055) 0, transparent 32%), radial-gradient(circle at 50% 82%, ${accentColor}16 0, transparent 58%); pointer-events:none;"></div>
                                 <div style="position:relative;">${posterSignalPillHTML}</div>
-                                <div style="position:relative; margin-top:10px; font-size:30px; font-weight:900; color:#ffffff; line-height:1.05; letter-spacing:-0.05em; text-shadow:0 14px 34px rgba(0,0,0,0.62);">${posterTitleHTML}</div>
-                                <div style="position:relative; margin-top:8px; font-size:9px; line-height:1.5; color:rgba(255,255,255,0.62); font-weight:900; max-width:266px; max-height:45px; overflow:hidden;">${safe(posterProofShort)}</div>
-                                <div style="position:relative; margin-top:10px; width:100%; max-width:270px; padding-top:2px;">
+                                <div style="position:relative; margin-top:8px; font-size:27px; font-weight:900; color:#ffffff; line-height:1.05; letter-spacing:-0.05em; text-shadow:0 14px 34px rgba(0,0,0,0.62);">${posterTitleHTML}</div>
+                                <div style="position:relative; margin-top:6px; font-size:9px; line-height:1.5; color:rgba(255,255,255,0.62); font-weight:900; max-width:266px; max-height:45px; overflow:hidden;">${safe(posterProofShort)}</div>
+                                <div style="position:relative; margin-top:8px; width:100%; max-width:270px; padding-top:2px;">
                                     <div style="font-size:10px; color:rgba(255,255,255,0.9); line-height:1.4; font-weight:900;">“${safe(posterQuote)}”</div>
-                                    <div style="margin-top:7px; display:inline-flex; align-items:center; gap:6px; color:${accentColor}; font-size:7px; font-family:monospace; font-weight:900; letter-spacing:0.12em; text-transform:uppercase;">
+                                    <div style="margin-top:6px; display:inline-flex; align-items:center; gap:6px; color:${accentColor}; font-size:7px; font-family:monospace; font-weight:900; letter-spacing:0.12em; text-transform:uppercase;">
                                         <span style="width:20px; height:1px; border-radius:999px; background:${accentColor}; opacity:0.72;"></span>
                                         ${safe(routeCode)}
                                         <span style="width:20px; height:1px; border-radius:999px; background:${accentColor}; opacity:0.72;"></span>
@@ -13507,27 +13507,27 @@ function generateDailyStatus(checkins, dateStr) {
                                 </div>
                             </div>
 
-                            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:0 2px 10px; padding:0 2px 9px; border-bottom:1px solid rgba(255,255,255,0.075); text-align:center; flex-shrink:0;">
+                            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:0 2px 8px; padding:0 2px 7px; border-bottom:1px solid rgba(255,255,255,0.075); text-align:center; flex-shrink:0;">
                                 ${permitStatsHTML}
                             </div>
 
-                            <div style="padding:0 2px 8px; margin-bottom:6px; flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center;">
-                                <div style="border:1px solid rgba(255,255,255,0.082); background:linear-gradient(145deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)); border-radius:22px; padding:11px 12px 10px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.035);">
-                                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+                            <div style="padding:0 2px 6px; margin-bottom:4px; flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center;">
+                                <div style="border:1px solid rgba(255,255,255,0.082); background:linear-gradient(145deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)); border-radius:22px; padding:8px 10px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.035);">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
                                         <div style="font-size:8px; font-weight:900; color:rgba(255,255,255,0.34); letter-spacing:0.14em; text-transform:uppercase; font-family:monospace;">TONIGHT ROUTE</div>
                                         <div style="font-size:7px; color:rgba(255,255,255,0.34); font-family:monospace; white-space:nowrap;">RECOVERY ${safe(guideValue)}</div>
                                     </div>
                                     <div>
-                                        <div style="font-size:19px; color:#ffffff; font-weight:900; line-height:1; letter-spacing:-0.02em;">${safe(visualCommand)}</div>
-                                        <div style="margin-top:6px; font-size:10.5px; color:rgba(255,255,255,0.82); font-weight:900; line-height:1.3;">${safe(routeFocusTitle)}</div>
-                                        <div style="margin-top:4px; font-size:8px; color:rgba(255,255,255,0.48); line-height:1.4; font-weight:800; max-height:25px; overflow:hidden;">${safe(routeFocusDesc)}</div>
+                                        <div style="font-size:17px; color:#ffffff; font-weight:900; line-height:1; letter-spacing:-0.02em;">${safe(visualCommand)}</div>
+                                        <div style="margin-top:4px; font-size:10px; color:rgba(255,255,255,0.82); font-weight:900; line-height:1.3;">${safe(routeFocusTitle)}</div>
+                                        <div style="margin-top:3px; font-size:8px; color:rgba(255,255,255,0.48); line-height:1.4; font-weight:800; max-height:25px; overflow:hidden;">${safe(routeFocusDesc)}</div>
                                     </div>
-                                    <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:8px;">${routeStepChipsHTML}</div>
+                                    <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:6px;">${routeStepChipsHTML}</div>
                                 </div>
-                                <div style="margin-top:7px; font-size:7.5px; color:rgba(255,255,255,0.36); line-height:1.3; font-weight:800; text-align:center;">${safe(heroProofLine)} · ${safe(posterSignature)}</div>
+                                <div style="margin-top:5px; font-size:7.5px; color:rgba(255,255,255,0.36); line-height:1.3; font-weight:800; text-align:center;">${safe(heroProofLine)} · ${safe(posterSignature)}</div>
                             </div>
 
-                            <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.075); padding-top:9px; margin-top:auto; flex-shrink:0;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.075); padding-top:7px; margin-top:auto; flex-shrink:0;">
                                 <div style="display:flex; align-items:center; gap:9px;">
                                     <div id="health-qrcode-box" style="width:40px; height:40px; background:#fff; border-radius:5px; overflow:hidden; display:flex; align-items:center; justify-content:center;"></div>
                                     <div>
@@ -13607,7 +13607,7 @@ function generateDailyStatus(checkins, dateStr) {
         });
 
 
-        async function captureCard(cardId, btnId, fileName) {
+                async function captureCard(cardId, btnId, fileName) {
             const card = document.getElementById(cardId);
             const btn  = document.getElementById(btnId);
             if (!card) { showToast('没有找到可生成的海报卡片'); return; }
@@ -13620,33 +13620,40 @@ function generateDailyStatus(checkins, dateStr) {
                 btn.style.opacity = '0.7';
             }
 
-            // 备份并隐藏 document.fonts 以绕过 WebView 著名的 document.fonts.ready 挂起 bug
+            // 备份并模拟/隐藏 document.fonts 以绕过 WebView 著名的 document.fonts.ready 挂起 bug
             const originalFonts = document.fonts;
-            try {
-                Object.defineProperty(document, 'fonts', {
-                    value: undefined,
-                    writable: true,
-                    configurable: true
-                });
-            } catch(fontErr) {
-                console.warn('Cannot hide document.fonts:', fontErr);
+            if (originalFonts) {
+                try {
+                    const mockFonts = Object.create(originalFonts);
+                    Object.defineProperty(mockFonts, 'ready', {
+                        get: () => Promise.resolve(),
+                        configurable: true
+                    });
+                    Object.defineProperty(document, 'fonts', {
+                        value: mockFonts,
+                        writable: true,
+                        configurable: true
+                    });
+                } catch(fontErr) {
+                    console.warn('Cannot mock document.fonts:', fontErr);
+                }
             }
 
-            // 备份 transform 和 zoom 样式，防止 html2canvas 渲染偏移/缩放模糊
-            const originalTransform = card.style.transform;
-            const originalTransformOrigin = card.style.transformOrigin;
-            const originalZoom = card.style.zoom || '';
-            const parentEl = card.parentElement;
-            const originalParentHeight = parentEl ? parentEl.style.height : '';
+            // 备份原始 DOM 位置与样式，彻底摆脱父级布局（如 flex/grid）和屏幕宽度挤压带来的折行排版崩溃
+            const originalParent = card.parentElement;
+            const originalNextSibling = card.nextSibling;
+            const originalStyle = card.getAttribute('style') || '';
 
-            // 重置缩放以进行原始尺寸截图
+            // 将卡片临时移到 body 根节点，并设为无压缩的 fixed 100% 原始大小布局（360x640）
+            document.body.appendChild(card);
+            card.style.position = 'fixed';
+            card.style.left = '-9999px';
+            card.style.top = '0';
+            card.style.width = '360px';
+            card.style.height = '640px';
+            card.style.zIndex = '-9999';
             card.style.transform = 'none';
-            card.style.zoom = '';
-            if (parentEl) {
-                parentEl.style.height = 'auto';
-            }
-
-            // (mask-image 剥离已移至 html2canvas onclone 回调中处理，避免修改真实 DOM)
+            card.style.zoom = '1';
 
             const originalSrcs = [];
             const imgs = Array.from(card.querySelectorAll('img'));
@@ -13724,17 +13731,44 @@ function generateDailyStatus(checkins, dateStr) {
                                 imageTimeout: 1500,
                                 onclone: function(clonedDoc, clonedEl) {
                                     try {
-                                        // 在克隆文档中剥离 mask-image，防止 createPattern 宽高为0崩溃
-                                        // html2canvas 渲染的是克隆DOM，必须在此处处理
-                                        clonedEl.querySelectorAll('[style]').forEach(function(el) {
+                                        // 1. 强制克隆 DOM 使用真实的 document.fonts，避免渲染时由于系统字 fallback 导致折行排版崩溃
+                                        if (originalFonts) {
+                                            try {
+                                                originalFonts.forEach(function(font) {
+                                                    clonedDoc.fonts.add(font);
+                                                });
+                                            } catch (fErr) {
+                                                console.warn('Failed to copy fonts to clone:', fErr);
+                                            }
+                                        }
+
+                                        // 2. 彻底清除 mask-image / mix-blend-mode / box-shadow / text-shadow 防止 html2canvas 渲染重叠文字与崩溃
+                                        clonedEl.style.setProperty('box-shadow', 'none', 'important');
+                                        clonedEl.style.setProperty('mix-blend-mode', 'normal', 'important');
+                                        clonedEl.querySelectorAll('*').forEach(function(el) {
                                             var s = el.getAttribute('style') || '';
+                                            var styleChanged = false;
                                             if (s.indexOf('mask-image') !== -1) {
                                                 s = s.replace(/-webkit-mask-image\s*:[^;]+;?\s*/g, '');
                                                 s = s.replace(/mask-image\s*:[^;]+;?\s*/g, '');
+                                                styleChanged = true;
+                                            }
+                                            if (s.indexOf('mix-blend-mode') !== -1) {
+                                                s = s.replace(/-webkit-mix-blend-mode\s*:[^;]+;?\\s*/g, '');
+                                                s = s.replace(/mix-blend-mode\s*:[^;]+;?\\s*/g, '');
+                                                styleChanged = true;
+                                            }
+                                            if (styleChanged) {
                                                 el.setAttribute('style', s);
                                             }
+                                            if (el.style) {
+                                                el.style.setProperty('box-shadow', 'none', 'important');
+                                                el.style.setProperty('text-shadow', 'none', 'important');
+                                                el.style.setProperty('mix-blend-mode', 'normal', 'important');
+                                            }
                                         });
-                                        // 修复0尺寸canvas（如QR码渲染失败），防止额外createPattern崩溃
+
+                                        // 3. 修复0尺寸canvas（如QR码渲染失败），防止额外createPattern崩溃
                                         clonedEl.querySelectorAll('canvas').forEach(function(cv) {
                                             if (!cv.width || !cv.height) {
                                                 cv.style.display = 'none';
@@ -13766,14 +13800,15 @@ function generateDailyStatus(checkins, dateStr) {
                 // 恢复图片 src
                 originalSrcs.forEach(({ img, src }) => { img.src = src; });
 
-
-                // 恢复 transform 和 zoom 样式
-                card.style.transform = originalTransform;
-                card.style.transformOrigin = originalTransformOrigin;
-                card.style.zoom = originalZoom;
-                if (parentEl) {
-                    parentEl.style.height = originalParentHeight;
+                // 将卡片放回原处，并恢复所有原始样式（如缩放、居中等）
+                if (originalParent) {
+                    if (originalNextSibling) {
+                        originalParent.insertBefore(card, originalNextSibling);
+                    } else {
+                        originalParent.appendChild(card);
+                    }
                 }
+                card.setAttribute('style', originalStyle);
 
                 // 恢复 document.fonts
                 if (originalFonts) {
