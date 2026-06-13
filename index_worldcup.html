@@ -2120,63 +2120,114 @@
     <!-- ================= 核心 JavaScript 逻辑 ================= -->
     <script>
         // ── HTML5 Plus App Native Bridge Injection ──
+        // ── HTML5+ App 原生相册保存桥 (Native Save-to-Gallery Bridge) ──
         (function() {
             function injectPlusBridge() {
                 if (!window.plus) return;
 
+                /**
+                 * 通过 HTML5+ plus.nativeObj.Bitmap + plus.gallery.save
+                 * 将 base64 PNG 真正写入 Android 系统相册。
+                 *
+                 * @param {string} dataUrl  完整 dataUrl, e.g. "data:image/png;base64,xxx"
+                 * @param {string} fileName 文件名, e.g. "yejiu_poster.png"
+                 */
                 const plusSaveToGallery = function(dataUrl, fileName) {
-                    try {
-                        const stamp = Date.now();
-                        const bitmap = new plus.nativeObj.Bitmap("yejiu_share_" + stamp);
-                        
-                        let cleanDataUrl = dataUrl;
-                        if (!cleanDataUrl.startsWith("data:image/")) {
-                            cleanDataUrl = "data:image/png;base64," + cleanDataUrl;
+                    // ─ 申请存储权限（Android 9 及以下需要 WRITE_EXTERNAL_STORAGE）─
+                    function doSave() {
+                        try {
+                            const stamp = Date.now();
+                            const bitmapId = "yejiu_share_" + stamp;
+                            const bitmap = new plus.nativeObj.Bitmap(bitmapId);
+
+                            // 确保 dataUrl 携带正确前缀
+                            let cleanDataUrl = (typeof dataUrl === "string") ? dataUrl.trim() : "";
+                            if (!cleanDataUrl.startsWith("data:image/")) {
+                                cleanDataUrl = "data:image/png;base64," + cleanDataUrl;
+                            }
+
+                            bitmap.loadBase64Data(
+                                cleanDataUrl,
+                                function() {
+                                    // 保存到应用私有临时目录
+                                    const tempPath = "_doc/yejiu_share_" + stamp + ".png";
+                                    bitmap.save(
+                                        tempPath,
+                                        { overwrite: true, format: "png" },
+                                        function() {
+                                            // 从临时文件写入系统相册
+                                            plus.gallery.save(
+                                                tempPath,
+                                                function() {
+                                                    bitmap.clear();
+                                                    (window.showToast || window.alert)("已保存到相册");
+                                                },
+                                                function(galleryErr) {
+                                                    bitmap.clear();
+                                                    console.error("[YejiuBridge] gallery.save failed:", galleryErr);
+                                                    (window.showToast || window.alert)("保存失败，请检查相册权限");
+                                                }
+                                            );
+                                        },
+                                        function(saveErr) {
+                                            bitmap.clear();
+                                            console.error("[YejiuBridge] bitmap.save failed:", saveErr);
+                                            (window.showToast || window.alert)("保存临时文件失败");
+                                        }
+                                    );
+                                },
+                                function(loadErr) {
+                                    bitmap.clear();
+                                    console.error("[YejiuBridge] loadBase64Data failed:", loadErr);
+                                    (window.showToast || window.alert)("图片数据解析失败");
+                                }
+                            );
+                        } catch (ex) {
+                            console.error("[YejiuBridge] exception:", ex);
+                            (window.showToast || window.alert)("保存失败，请稍后再试");
                         }
-                        
-                        bitmap.loadBase64Data(cleanDataUrl, function() {
-                            const tempPath = "_doc/yejiu_share_" + stamp + ".png";
-                            bitmap.save(tempPath, { overwrite: true, format: "png" }, function() {
-                                plus.gallery.save(tempPath, function() {
-                                    bitmap.clear();
-                                    if (window.showToast) {
-                                        window.showToast("海报已成功保存到系统相册");
+                    }
+
+                    // Android 9 及以下需要运行时申请写入权限
+                    const sdkVersion = plus.os.version ? parseInt(plus.os.version) : 99;
+                    if (sdkVersion < 10 && plus.android) {
+                        try {
+                            plus.android.requestPermissions(
+                                ["android.permission.WRITE_EXTERNAL_STORAGE"],
+                                function(e) {
+                                    if (e.deniedAlways && e.deniedAlways.length > 0) {
+                                        (window.showToast || window.alert)("请在系统设置中开启存储权限");
                                     } else {
-                                        alert("海报已成功保存到系统相册");
+                                        doSave();
                                     }
-                                }, function(err) {
-                                    bitmap.clear();
-                                    console.error("Gallery save failed:", err);
-                                    if (window.showToast) window.showToast("保存至相册失败，请检查存储权限");
-                                });
-                            }, function(err) {
-                                bitmap.clear();
-                                console.error("Bitmap save failed:", err);
-                                if (window.showToast) window.showToast("保存临时文件失败");
-                            });
-                        }, function(err) {
-                            bitmap.clear();
-                            console.error("Load base64 failed:", err);
-                            if (window.showToast) window.showToast("加载图片数据失败");
-                        });
-                    } catch (ex) {
-                        console.error("Native bridge exception:", ex);
+                                },
+                                function(e) {
+                                    console.warn("[YejiuBridge] Permission request error:", e);
+                                    doSave(); // 降级尝试
+                                }
+                            );
+                        } catch(permErr) {
+                            console.warn("[YejiuBridge] requestPermissions not available:", permErr);
+                            doSave();
+                        }
+                    } else {
+                        // Android 10+ 使用 MediaStore，无需手动申请写入权限
+                        doSave();
                     }
                 };
 
-                // Inject into YejiuNative
+                // 同时挂载到 YejiuNative 和 Android 两个命名空间
                 window.YejiuNative = window.YejiuNative || {};
-                window.YejiuNative.saveImage = plusSaveToGallery;
-                window.YejiuNative.saveImageToAlbum = plusSaveToGallery;
+                window.YejiuNative.saveImage          = plusSaveToGallery;
+                window.YejiuNative.saveImageToAlbum   = plusSaveToGallery;
                 window.YejiuNative.saveImageToGallery = plusSaveToGallery;
 
-                // Inject into Android
                 window.Android = window.Android || {};
-                window.Android.saveImage = plusSaveToGallery;
-                window.Android.saveImageToAlbum = plusSaveToGallery;
+                window.Android.saveImage          = plusSaveToGallery;
+                window.Android.saveImageToAlbum   = plusSaveToGallery;
                 window.Android.saveImageToGallery = plusSaveToGallery;
 
-                console.log("Yejiu Native Bridge (HTML5 Plus) injected successfully.");
+                console.log("[YejiuBridge] HTML5+ native save bridge ready.");
             }
 
             if (window.plus) {
@@ -13696,7 +13747,25 @@ function generateDailyStatus(checkins, dateStr) {
             const btn  = document.getElementById(btnId);
             if (!card) { showToast('没有找到可生成的海报卡片'); return; }
 
-            openPosterShareSheet(cardId, fileName);
+            const shareOriginalHTML = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.innerHTML = '<span style="margin-right:6px">⌛</span> 正在生成海报...';
+                btn.disabled = true;
+                btn.style.opacity = '0.76';
+            }
+            try {
+                const dataUrl = await renderPosterCardDataUrl(cardId);
+                openPosterShareSheet(cardId, fileName, dataUrl);
+            } catch (err) {
+                console.warn('Poster render before share failed:', err);
+                showToast('海报生成失败，请稍后再试');
+            } finally {
+                if (btn) {
+                    btn.innerHTML = shareOriginalHTML;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }
+            }
             return;
 
             // loading 状态
@@ -14025,6 +14094,37 @@ function generateDailyStatus(checkins, dateStr) {
             });
         }
 
+        function waitForPosterImages(root, timeout = 2200) {
+            const imgs = Array.from(root.querySelectorAll('img'));
+            if (!imgs.length) return Promise.resolve();
+            return Promise.all(imgs.map(img => {
+                if (img.complete && img.naturalWidth) return Promise.resolve();
+                return new Promise(resolve => {
+                    let done = false;
+                    const finish = () => {
+                        if (done) return;
+                        done = true;
+                        img.onload = null;
+                        img.onerror = null;
+                        resolve();
+                    };
+                    img.onload = finish;
+                    img.onerror = finish;
+                    if (typeof img.decode === 'function') {
+                        img.decode().then(finish).catch(() => {});
+                    }
+                    setTimeout(finish, timeout);
+                });
+            }));
+        }
+
+        function withPosterTimeout(promise, ms, message) {
+            return Promise.race([
+                promise,
+                new Promise((_, reject) => setTimeout(() => reject(new Error(message || 'poster timeout')), ms))
+            ]);
+        }
+
         async function renderPosterCardDataUrl(cardId) {
             const card = document.getElementById(cardId);
             if (!card) throw new Error('没有找到海报卡片');
@@ -14035,30 +14135,24 @@ function generateDailyStatus(checkins, dateStr) {
             document.body.appendChild(renderRoot);
 
             try {
-                const imgs = Array.from(clone.querySelectorAll('img'));
-                await Promise.all(imgs.map(img => {
-                    if (img.complete && img.naturalWidth) return Promise.resolve();
-                    return new Promise(resolve => {
-                        img.onload = resolve;
-                        img.onerror = resolve;
-                    });
-                }));
+                await waitForPosterImages(clone, 2200);
                 await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
                 if (typeof html2canvas !== 'function') {
                     throw new Error('html2canvas 未加载');
                 }
-                const renderTask = html2canvas(clone, {
-                    backgroundColor: '#000000',
-                    scale: Math.min(2.4, window.devicePixelRatio || 2),
-                    useCORS: true,
-                    allowTaint: true,
-                    logging: false,
-                    imageTimeout: 3000
-                });
-                const timeoutTask = new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error('生成超时')), 9000);
-                });
-                const canvas = await Promise.race([renderTask, timeoutTask]);
+                const canvas = await withPosterTimeout(
+                    html2canvas(clone, {
+                        backgroundColor: '#000000',
+                        scale: Math.min(2, window.devicePixelRatio || 2),
+                        useCORS: true,
+                        allowTaint: true,
+                        logging: false,
+                        imageTimeout: 2000,
+                        removeContainer: true
+                    }),
+                    10000,
+                    '生成超时'
+                );
                 return canvas.toDataURL('image/png');
             } finally {
                 renderRoot.remove();
@@ -14073,7 +14167,17 @@ function generateDailyStatus(checkins, dateStr) {
             const payload = buildPosterSharePayload(card, fileName);
             const shareId = "share-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
             window.__yejiuPosterShares = window.__yejiuPosterShares || {};
-            window.__yejiuPosterShares[shareId] = { cardId, fileName, payload, dataUrl };
+            const shareData = { cardId, fileName, payload, dataUrl };
+            if (dataUrl) {
+                try {
+                    shareData.blob = posterDataUrlToBlob(dataUrl);
+                    shareData.objectUrl = URL.createObjectURL(shareData.blob);
+                    shareData.downloadName = getPosterFileName(fileName);
+                } catch (err) {
+                    console.warn('Prepare poster blob failed:', err);
+                }
+            }
+            window.__yejiuPosterShares[shareId] = shareData;
 
             const iconSave = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
             const iconShare = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4"/><path d="m15.4 6.5-6.8 4"/></svg>`;
@@ -14091,8 +14195,26 @@ function generateDailyStatus(checkins, dateStr) {
             `;
             document.body.appendChild(modal);
             const previewSlot = modal.querySelector('.poster-share-preview-slot');
-            if (previewSlot) mountPosterClonePreview(previewSlot, card, cardId);
-            setTimeout(() => preloadPosterImageForShare(shareId), 80);
+            if (previewSlot && dataUrl) {
+                previewSlot.innerHTML = `
+                    <div style="width:360px; transform-origin:top center; will-change:transform;">
+                        <img src="${dataUrl}" alt="夜啾分享海报" style="width:360px; display:block; border-radius:22px; pointer-events:auto;">
+                    </div>
+                `;
+                requestAnimationFrame(() => {
+                    const holder = previewSlot.querySelector('div');
+                    const img = previewSlot.querySelector('img');
+                    const measuredHeight = Math.max(1, Math.ceil(img?.naturalHeight ? 360 * img.naturalHeight / img.naturalWidth : holder.scrollHeight || 640));
+                    const maxPreviewWidth = Math.min(window.innerWidth - 48, 342);
+                    const maxPreviewHeight = Math.min(window.innerHeight * 0.58, 570);
+                    const scale = Math.min(1, maxPreviewWidth / 360, maxPreviewHeight / measuredHeight);
+                    holder.style.height = `${measuredHeight}px`;
+                    holder.style.transform = `scale(${scale})`;
+                    previewSlot.style.height = `${Math.ceil(measuredHeight * scale)}px`;
+                });
+            } else if (previewSlot) {
+                mountPosterClonePreview(previewSlot, card, cardId);
+            }
         }
 
         function openPosterShareSheet(cardId, fileName, dataUrl) {
