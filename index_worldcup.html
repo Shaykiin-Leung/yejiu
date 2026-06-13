@@ -2119,6 +2119,73 @@
 
     <!-- ================= 核心 JavaScript 逻辑 ================= -->
     <script>
+        // ── HTML5 Plus App Native Bridge Injection ──
+        (function() {
+            function injectPlusBridge() {
+                if (!window.plus) return;
+
+                const plusSaveToGallery = function(dataUrl, fileName) {
+                    try {
+                        const stamp = Date.now();
+                        const bitmap = new plus.nativeObj.Bitmap("yejiu_share_" + stamp);
+                        
+                        let cleanDataUrl = dataUrl;
+                        if (!cleanDataUrl.startsWith("data:image/")) {
+                            cleanDataUrl = "data:image/png;base64," + cleanDataUrl;
+                        }
+                        
+                        bitmap.loadBase64Data(cleanDataUrl, function() {
+                            const tempPath = "_doc/yejiu_share_" + stamp + ".png";
+                            bitmap.save(tempPath, { overwrite: true, format: "png" }, function() {
+                                plus.gallery.save(tempPath, function() {
+                                    bitmap.clear();
+                                    if (window.showToast) {
+                                        window.showToast("海报已成功保存到系统相册");
+                                    } else {
+                                        alert("海报已成功保存到系统相册");
+                                    }
+                                }, function(err) {
+                                    bitmap.clear();
+                                    console.error("Gallery save failed:", err);
+                                    if (window.showToast) window.showToast("保存至相册失败，请检查存储权限");
+                                });
+                            }, function(err) {
+                                bitmap.clear();
+                                console.error("Bitmap save failed:", err);
+                                if (window.showToast) window.showToast("保存临时文件失败");
+                            });
+                        }, function(err) {
+                            bitmap.clear();
+                            console.error("Load base64 failed:", err);
+                            if (window.showToast) window.showToast("加载图片数据失败");
+                        });
+                    } catch (ex) {
+                        console.error("Native bridge exception:", ex);
+                    }
+                };
+
+                // Inject into YejiuNative
+                window.YejiuNative = window.YejiuNative || {};
+                window.YejiuNative.saveImage = plusSaveToGallery;
+                window.YejiuNative.saveImageToAlbum = plusSaveToGallery;
+                window.YejiuNative.saveImageToGallery = plusSaveToGallery;
+
+                // Inject into Android
+                window.Android = window.Android || {};
+                window.Android.saveImage = plusSaveToGallery;
+                window.Android.saveImageToAlbum = plusSaveToGallery;
+                window.Android.saveImageToGallery = plusSaveToGallery;
+
+                console.log("Yejiu Native Bridge (HTML5 Plus) injected successfully.");
+            }
+
+            if (window.plus) {
+                injectPlusBridge();
+            } else {
+                document.addEventListener('plusready', injectPlusBridge);
+            }
+        })();
+
 const crossOriginAttr = window.location.protocol === 'file:' ? '' : 'crossorigin="anonymous"';
 
         // ── 图片绝对路径计算（修复 file:// 下动态注入图片加载失败） ──
@@ -6078,7 +6145,7 @@ const CUSTOM_MATCH_ADVICE = {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
                         📸 生成今日图鉴海报
                     </button>
-                    <div style="text-align:center; font-size:10px; color:#3f3f46;">生成 PNG 图片，可直接保存到相册或分享到微信</div>
+                    <div style="text-align:center; font-size:10px; color:#3f3f46;">生成 PNG 图片，可下载保存</div>
                 </div>
             `;
             document.body.appendChild(modal);
@@ -6256,7 +6323,7 @@ const CUSTOM_MATCH_ADVICE = {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
                         📸 生成分享海报
                     </button>
-                    <div style="text-align:center; font-size:10px; color:#3f3f46;">生成 PNG 图片，可直接保存到相册或分享到微信</div>
+                    <div style="text-align:center; font-size:10px; color:#3f3f46;">生成 PNG 图片，可下载保存</div>
                 </div>
             `;
             document.body.appendChild(modal);
@@ -14012,6 +14079,7 @@ function generateDailyStatus(checkins, dateStr) {
             document.body.appendChild(modal);
             const previewSlot = modal.querySelector('.poster-share-preview-slot');
             if (previewSlot) mountPosterClonePreview(previewSlot, card, cardId);
+            setTimeout(() => preloadPosterImageForShare(shareId), 80);
         }
 
         function openPosterShareSheet(cardId, fileName, dataUrl) {
@@ -14057,14 +14125,190 @@ function generateDailyStatus(checkins, dateStr) {
         function posterShareButtonHTML(shareId, channel, label, iconHtml, gradient, wide = false) {
             const buttonSize = wide ? '72px' : '52px';
             const labelSize = wide ? '15px' : '11px';
+            const buttonId = channel === 'saveImage' ? `poster-save-button-${shareId}` : '';
+            const labelId = channel === 'saveImage' ? `poster-save-label-${shareId}` : '';
             return `
                 <div style="text-align:center; flex:0 0 auto;">
-                    <button type="button" onclick="sharePosterVia('${shareId}', '${channel}')" style="width:${buttonSize}; height:${buttonSize}; border-radius:999px; border:none; background:${gradient}; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 34px rgba(124,58,237,0.36); margin:0 auto; cursor:pointer; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
+                    <button ${buttonId ? `id="${buttonId}"` : ''} type="button" onclick="sharePosterVia('${shareId}', '${channel}')" style="width:${buttonSize}; height:${buttonSize}; border-radius:999px; border:none; background:${gradient}; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 34px rgba(124,58,237,0.36); margin:0 auto; cursor:pointer; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
                         ${iconHtml}
                     </button>
-                    <div style="font-size:${labelSize}; color:rgba(255,255,255,0.92); margin-top:10px; font-weight:900; white-space:nowrap; font-family:'Outfit','Noto Sans SC',sans-serif; letter-spacing:0.03em;">${label}</div>
+                    <div ${labelId ? `id="${labelId}"` : ''} style="font-size:${labelSize}; color:rgba(255,255,255,0.92); margin-top:10px; font-weight:900; white-space:nowrap; font-family:'Outfit','Noto Sans SC',sans-serif; letter-spacing:0.03em;">${label}</div>
                 </div>
             `;
+        }
+
+        function setPosterSaveButtonState(shareId, state, label) {
+            const btn = document.getElementById(`poster-save-button-${shareId}`);
+            const text = document.getElementById(`poster-save-label-${shareId}`);
+            if (text && label) text.textContent = label;
+            if (!btn) return;
+            if (state === 'loading') {
+                btn.disabled = true;
+                btn.style.opacity = '0.65';
+                btn.style.cursor = 'wait';
+            } else {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            }
+        }
+
+        function posterDataUrlToBlob(dataUrl) {
+            const parts = String(dataUrl || '').split(',');
+            const mime = (parts[0].match(/data:([^;]+)/) || [])[1] || 'image/png';
+            const binary = atob(parts[1] || '');
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+            return new Blob([bytes], { type: mime });
+        }
+
+        function getPosterFileName(fileName) {
+            const raw = (fileName || '夜啾_分享海报').replace(/[\\/:*?"<>|]/g, '_');
+            return raw.endsWith('.png') ? raw : `${raw}.png`;
+        }
+
+        async function ensurePosterImageReady(shareId) {
+            const shareData = window.__yejiuPosterShares?.[shareId];
+            if (!shareData) throw new Error('分享内容已失效');
+            if (shareData.blob && shareData.objectUrl) return shareData;
+
+            if (!shareData.renderPromise) {
+                shareData.renderPromise = (async () => {
+                    if (!shareData.dataUrl) {
+                        shareData.dataUrl = await renderPosterCardDataUrl(shareData.cardId);
+                    }
+                    shareData.blob = posterDataUrlToBlob(shareData.dataUrl);
+                    if (shareData.objectUrl) URL.revokeObjectURL(shareData.objectUrl);
+                    shareData.objectUrl = URL.createObjectURL(shareData.blob);
+                    shareData.downloadName = getPosterFileName(shareData.fileName);
+                    return shareData;
+                })().finally(() => {
+                    shareData.renderPromise = null;
+                });
+            }
+            return shareData.renderPromise;
+        }
+
+        async function preloadPosterImageForShare(shareId) {
+            const shareData = window.__yejiuPosterShares?.[shareId];
+            if (!shareData) return;
+
+            const swapPreview = (dataUrl) => {
+                const modal = document.getElementById('poster-share-sheet');
+                if (modal) {
+                    const slot = modal.querySelector('.poster-share-preview-slot');
+                    const holder = slot ? slot.querySelector('div') : null;
+                    if (holder) {
+                        const img = document.createElement('img');
+                        img.src = dataUrl;
+                        img.alt = '夜啾分享海报';
+                        img.style.cssText = 'width:360px; height:100%; display:block; border-radius:22px; pointer-events:auto;';
+                        holder.innerHTML = '';
+                        holder.appendChild(img);
+                    }
+                }
+            };
+
+            // If already preloaded and generated
+            if (shareData.dataUrl) {
+                setPosterSaveButtonState(shareId, 'ready', '保存到本地');
+                swapPreview(shareData.dataUrl);
+                return;
+            }
+
+            if (shareData.renderPromise) return;
+
+            try {
+                setPosterSaveButtonState(shareId, 'loading', '准备图片');
+                const readyData = await ensurePosterImageReady(shareId);
+                setPosterSaveButtonState(shareId, 'ready', '保存到本地');
+                swapPreview(readyData.dataUrl);
+            } catch (err) {
+                console.warn('Preload poster failed:', err);
+                setPosterSaveButtonState(shareId, 'ready', '重新生成');
+            }
+        }
+
+        function triggerNativePosterSave(shareData) {
+            const dataUrl = shareData?.dataUrl;
+            if (!dataUrl) return false;
+            const fileName = shareData.downloadName || getPosterFileName(shareData.fileName);
+            const base64 = dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl;
+            const payload = { type: 'YEJIU_SAVE_IMAGE', fileName, mime: 'image/png', dataUrl, base64 };
+
+            const calls = [
+                [window.YejiuNative, 'saveImage'],
+                [window.YejiuNative, 'saveImageToAlbum'],
+                [window.YejiuNative, 'saveImageToGallery'],
+                [window.Android, 'saveImage'],
+                [window.Android, 'saveImageToAlbum'],
+                [window.Android, 'saveImageToGallery']
+            ];
+            for (const [owner, method] of calls) {
+                if (owner && typeof owner[method] === 'function') {
+                    try {
+                        owner[method](dataUrl, fileName);
+                        return true;
+                    } catch (err) {
+                        console.warn(`Native poster save failed: ${method}`, err);
+                    }
+                }
+            }
+
+            try {
+                if (window.webkit?.messageHandlers?.saveImage?.postMessage) {
+                    window.webkit.messageHandlers.saveImage.postMessage(payload);
+                    return true;
+                }
+                if (window.ReactNativeWebView?.postMessage) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify(payload));
+                    return true;
+                }
+            } catch (err) {
+                console.warn('Native poster message bridge failed:', err);
+            }
+            return false;
+        }
+
+        function triggerPosterBrowserDownload(shareData) {
+            const objectUrl = shareData.objectUrl || URL.createObjectURL(shareData.blob);
+            shareData.objectUrl = objectUrl;
+            const fileName = shareData.downloadName || getPosterFileName(shareData.fileName);
+            const link = document.createElement('a');
+            link.href = objectUrl;
+            link.download = fileName;
+            link.rel = 'noopener';
+            link.style.cssText = 'position:fixed; left:-9999px; top:0; opacity:0;';
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => link.remove(), 120);
+            return true;
+        }
+
+        async function savePosterImageFromShare(shareId) {
+            const shareData = window.__yejiuPosterShares?.[shareId];
+            if (!shareData) { showToast('分享内容已失效，请重新打开'); return; }
+
+            try {
+                if (!shareData.blob) {
+                    setPosterSaveButtonState(shareId, 'loading', '生成中...');
+                    showToast('正在生成可保存图片...');
+                }
+                const readyData = await ensurePosterImageReady(shareId);
+                setPosterSaveButtonState(shareId, 'ready', '再次保存');
+
+                if (triggerNativePosterSave(readyData)) {
+                    showToast('已发送到系统保存');
+                    return;
+                }
+
+                triggerPosterBrowserDownload(readyData);
+                showToast('已触发保存/下载；如果浏览器拦截，请再点一次');
+            } catch (err) {
+                console.warn('Save poster failed:', err);
+                setPosterSaveButtonState(shareId, 'ready', '重新保存');
+                showToast('保存失败，请稍后再试');
+            }
         }
 
         async function sharePosterVia(shareId, channel) {
@@ -14088,20 +14332,7 @@ function generateDailyStatus(checkins, dateStr) {
             }
 
             if (channel === 'saveImage') {
-                if (!dataUrl) {
-                    showToast('正在生成海报图片...');
-                    try {
-                        dataUrl = await renderPosterCardDataUrl(shareData.cardId);
-                        shareData.dataUrl = dataUrl;
-                    } catch (renderErr) {
-                        console.warn('Render poster image failed:', renderErr);
-                        showToast('生成图片失败，请稍后再试');
-                        return;
-                    }
-                }
-                if (!dataUrl) { showToast('没有找到可保存的海报图片'); return; }
-                _downloadDataUrl(dataUrl, `${fileName || '夜啾_分享海报'}.png`);
-                closePosterShareSheet();
+                await savePosterImageFromShare(shareId);
                 return;
                 showToast('正在调起保存...');
                 try {
@@ -14186,23 +14417,18 @@ function generateDailyStatus(checkins, dateStr) {
             const a = document.createElement('a');
             let objectUrl = '';
             try {
-                const parts = dataUrl.split(',');
-                const mime = (parts[0].match(/data:([^;]+)/) || [])[1] || 'image/png';
-                const binary = atob(parts[1] || '');
-                const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-                objectUrl = URL.createObjectURL(new Blob([bytes], { type: mime }));
+                objectUrl = URL.createObjectURL(posterDataUrlToBlob(dataUrl));
                 a.href = objectUrl;
             } catch (err) {
                 console.warn('Blob download fallback to data url:', err);
                 a.href = dataUrl;
             }
-            a.download = fileName || '夜啾_分享海报.png';
+            a.download = getPosterFileName(fileName || '夜啾_分享海报');
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            if (objectUrl) setTimeout(() => URL.revokeObjectURL(objectUrl), 1200);
-            showToast('海报已保存');
+            if (objectUrl) setTimeout(() => URL.revokeObjectURL(objectUrl), 8000);
+            showToast('已触发保存/下载');
         }
 
         function escapePosterShareHTML(value) {
