@@ -6125,7 +6125,7 @@ const CUSTOM_MATCH_ADVICE = {
         }
 
         function showBattleReport(forceDiagnosisId = null) {
-            const reportHTML = generateReportHTML(forceDiagnosisId, true);
+            const reportHTML = generateReportHTML(forceDiagnosisId, false);
 
             const existingModal = document.getElementById('battle-report-modal');
             if (existingModal) existingModal.remove();
@@ -6136,8 +6136,14 @@ const CUSTOM_MATCH_ADVICE = {
             modal.onclick = (e) => { if (e.target === modal) closeBattleReport(); };
 
             modal.innerHTML = `
-                <div class="yejiu-modal-pop" style="width:100%; max-width:392px; margin:auto; display:flex; flex-direction:column; gap:12px; box-sizing:border-box;">
-                    <div class="poster-scale-wrapper" style="width:100%; overflow:hidden; display:flex; justify-content:center; align-items:center;">
+                <div class="yejiu-modal-pop" style="width:100%; max-width:392px; margin:auto; display:flex; flex-direction:column; gap:12px; box-sizing:border-box; align-items:stretch;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:0 4px 2px;">
+                        <div style="font-size:15px; font-weight:900; color:#ffffff; display:flex; align-items:center; gap:10px; letter-spacing:0.02em;">
+                            <svg onclick="closeBattleReport()" style="cursor:pointer; color:#d4d4d8;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                            每日图鉴收录
+                        </div>
+                    </div>
+                    <div class="poster-scale-wrapper" style="width:100%; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-start; align-items:center; flex:0 0 auto;">
                         ${reportHTML}
                     </div>
                     <!-- 一键生成海报分享按钮 -->
@@ -14038,7 +14044,10 @@ function generateDailyStatus(checkins, dateStr) {
                     });
                 }));
                 await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-                const canvas = await html2canvas(clone, {
+                if (typeof html2canvas !== 'function') {
+                    throw new Error('html2canvas 未加载');
+                }
+                const renderTask = html2canvas(clone, {
                     backgroundColor: '#000000',
                     scale: Math.min(2.4, window.devicePixelRatio || 2),
                     useCORS: true,
@@ -14046,6 +14055,10 @@ function generateDailyStatus(checkins, dateStr) {
                     logging: false,
                     imageTimeout: 3000
                 });
+                const timeoutTask = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('生成超时')), 9000);
+                });
+                const canvas = await Promise.race([renderTask, timeoutTask]);
                 return canvas.toDataURL('image/png');
             } finally {
                 renderRoot.remove();
@@ -14142,15 +14155,9 @@ function generateDailyStatus(checkins, dateStr) {
             const text = document.getElementById(`poster-save-label-${shareId}`);
             if (text && label) text.textContent = label;
             if (!btn) return;
-            if (state === 'loading') {
-                btn.disabled = true;
-                btn.style.opacity = '0.65';
-                btn.style.cursor = 'wait';
-            } else {
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                btn.style.cursor = 'pointer';
-            }
+            btn.disabled = false;
+            btn.style.opacity = state === 'loading' ? '0.86' : '1';
+            btn.style.cursor = state === 'loading' ? 'progress' : 'pointer';
         }
 
         function posterDataUrlToBlob(dataUrl) {
@@ -14285,29 +14292,57 @@ function generateDailyStatus(checkins, dateStr) {
             return true;
         }
 
+        async function triggerPosterSystemFileShare(shareData) {
+            if (!navigator.share || !navigator.canShare || !shareData?.blob) return false;
+            try {
+                const fileName = shareData.downloadName || getPosterFileName(shareData.fileName);
+                const file = new File([shareData.blob], fileName, { type: 'image/png' });
+                if (!navigator.canShare({ files: [file] })) return false;
+                await navigator.share({ files: [file], title: '夜啾分享海报' });
+                return true;
+            } catch (err) {
+                if (err?.name !== 'AbortError') console.warn('System file share failed:', err);
+                return false;
+            }
+        }
+
         async function savePosterImageFromShare(shareId) {
             const shareData = window.__yejiuPosterShares?.[shareId];
             if (!shareData) { showToast('分享内容已失效，请重新打开'); return; }
 
             try {
-                if (!shareData.blob) {
-                    setPosterSaveButtonState(shareId, 'loading', '生成中...');
-                    showToast('正在生成可保存图片...');
+                if (shareData.blob && shareData.objectUrl) {
+                    if (triggerNativePosterSave(shareData)) {
+                        showToast('已发送到系统保存');
+                        return;
+                    }
+                    triggerPosterBrowserDownload(shareData);
+                    showToast('已触发保存/下载');
+                    return;
                 }
+
+                setPosterSaveButtonState(shareId, 'loading', '生成中...');
+                showToast('正在生成 PNG 图片...');
                 const readyData = await ensurePosterImageReady(shareId);
-                setPosterSaveButtonState(shareId, 'ready', '再次保存');
+                setPosterSaveButtonState(shareId, 'ready', '保存到本地');
 
                 if (triggerNativePosterSave(readyData)) {
                     showToast('已发送到系统保存');
                     return;
                 }
 
+                const shared = await triggerPosterSystemFileShare(readyData);
+                if (shared) {
+                    showToast('已打开系统保存/分享面板');
+                    return;
+                }
+
                 triggerPosterBrowserDownload(readyData);
-                showToast('已触发保存/下载；如果浏览器拦截，请再点一次');
+                showToast('已触发保存/下载；如果没有弹出，请再点一次');
             } catch (err) {
                 console.warn('Save poster failed:', err);
                 setPosterSaveButtonState(shareId, 'ready', '重新保存');
-                showToast('保存失败，请稍后再试');
+                showToast('生成失败，请重新点一次');
             }
         }
 
