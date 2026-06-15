@@ -13681,8 +13681,8 @@ function generateDailyStatus(checkins, dateStr) {
                     { label: 'OFF', title: '看完断网回收', desc: routeWrapText, color: hostAccents.green }
                 ];
             const routeStepChipsHTML = mapSteps.map((step) => `
-                <span data-export-role="health-route-chip" style="display:inline-flex; align-items:center; height:18px; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.025); border-radius:999px; padding:0 8px; box-sizing:border-box; line-height:1; gap:5px; min-width:0; max-width:100%;">
-                    <span style="width:5px; height:5px; border-radius:999px; background:${step.color}; box-shadow:0 0 10px ${step.color}55; flex-shrink:0; display:inline-block;"></span>
+                <span data-export-role="health-route-chip" style="display:inline-grid; grid-template-columns:5px auto auto; align-items:center; column-gap:5px; height:20px; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.025); border-radius:999px; padding:0 9px; box-sizing:border-box; line-height:1; min-width:0; max-width:100%; vertical-align:middle;">
+                    <span data-export-role="route-chip-dot" style="width:5px; height:5px; border-radius:999px; background:${step.color}; box-shadow:0 0 10px ${step.color}55; display:block;"></span>
                     <span data-export-role="route-chip-label" style="font-size:7.5px; color:rgba(255,255,255,0.52); font-family:'Outfit',sans-serif; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; flex-shrink:0; line-height:1; display:inline-block;">${safe(step.label)}</span>
                     <span data-export-role="route-chip-title" style="font-size:8px; color:rgba(255,255,255,0.72); font-family:'Noto Sans SC','Outfit',sans-serif; font-weight:900; white-space:nowrap; line-height:1; display:inline-block;">${safe(step.title)}</span>
                 </span>
@@ -13691,9 +13691,9 @@ function generateDailyStatus(checkins, dateStr) {
             const passLabel = realtimeCount === 0 ? 'NIGHT REST PASS' : (realtimeCount === 1 ? 'ONE MATCH PASS' : 'OVERTIME PASS');
             const routeCode = realtimeCount === 0 ? 'REST-00' : (realtimeCount === 1 ? 'LIVE-01' : `LIVE-${String(realtimeCount).padStart(2, '0')}`);
             const posterSignalPillHTML = `
-                <div style="display:inline-flex; align-items:center; justify-content:center; gap:7px; border:1px solid rgba(255,255,255,0.12); background:rgba(0,0,0,0.28); border-radius:999px; padding:5px 10px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.045);">
+                <div data-export-role="poster-pass-pill" style="display:inline-flex; align-items:center; justify-content:center; gap:7px; border:1px solid rgba(255,255,255,0.12); background:rgba(0,0,0,0.28); border-radius:999px; padding:5px 10px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.045);">
                     <span style="display:inline-flex; gap:4px; align-items:center;">${hostDotsHTML}</span>
-                    <span style="font-size:7px; color:rgba(255,255,255,0.68); font-weight:900; letter-spacing:0.12em; text-transform:uppercase; font-family:monospace;">${safe(passLabel)}</span>
+                    <span data-export-role="poster-pass-label" style="font-size:7px; color:rgba(255,255,255,0.68); font-weight:900; letter-spacing:0.12em; text-transform:uppercase; font-family:monospace;">${safe(passLabel)}</span>
                 </div>
             `;
             const heroProofLine = realtimeCount === 0
@@ -13800,7 +13800,7 @@ function generateDailyStatus(checkins, dateStr) {
                                         <div style="font-size:6.5px; color:rgba(255,255,255,0.22); line-height:1.35; margin-top:2px;">扫码生成你的护航卡</div>
                                     </div>
                                 </div>
-                                <div data-export-role="poster-stamp" style="font-size:8px; color:${accentColor}; font-weight:900; text-transform:uppercase; border:1.5px solid ${accentColor}; border-radius:999px; height:18px; padding:0 10px; box-sizing:border-box; transform:rotate(-5deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px ${accentColor}42, inset 0 0 8px ${accentColor}16; background:rgba(0,0,0,0.25);">${stampText}</div>
+                                <div data-export-role="poster-stamp" style="font-size:7.5px; color:${accentColor}; font-weight:900; text-transform:uppercase; border:1.5px solid ${accentColor}; border-radius:999px; height:22px; padding:0 12px; box-sizing:border-box; transform:rotate(-5deg); display:inline-block; text-align:center; line-height:20px; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px ${accentColor}42, inset 0 0 8px ${accentColor}16; background:rgba(0,0,0,0.25);">${stampText}</div>
                             </div>
                         </div>
                         <div style="height:2px; background:${hostRibbon}; opacity:0.82;"></div>
@@ -14213,13 +14213,15 @@ function generateDailyStatus(checkins, dateStr) {
         function stabilizePosterExportClone(clone, cardId, useComputed = false) {
             if (!clone) return;
 
-            const textFont = "'Outfit', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif";
+            const textFont = "'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif";
             const monoFont = "'SFMono-Regular', 'Roboto Mono', 'Consolas', monospace";
             const nodes = [clone, ...Array.from(clone.querySelectorAll('*'))];
 
             clone.style.webkitFontSmoothing = 'antialiased';
             clone.style.textRendering = 'geometricPrecision';
             clone.style.fontKerning = 'normal';
+            clone.style.webkitTextSizeAdjust = '100%';
+            clone.style.textSizeAdjust = '100%';
             clone.style.contain = 'layout paint style';
 
             const getFontSize = (el, computed) => {
@@ -14242,6 +14244,11 @@ function generateDailyStatus(checkins, dateStr) {
                 el.style.boxSizing = 'border-box';
                 el.style.webkitFontSmoothing = 'antialiased';
                 el.style.textRendering = 'geometricPrecision';
+                el.style.fontVariantLigatures = 'none';
+                el.style.fontFeatureSettings = '"liga" 0, "kern" 1';
+                el.style.webkitTextSizeAdjust = '100%';
+                el.style.textSizeAdjust = '100%';
+                el.style.verticalAlign = el.style.verticalAlign || 'middle';
 
                 if (el !== clone && (styleDisplay.includes('inline-flex') || /align-items\s*:/.test(styleText) || el.hasAttribute('data-export-role'))) {
                     el.style.alignItems = el.style.alignItems || 'center';
@@ -14286,19 +14293,18 @@ function generateDailyStatus(checkins, dateStr) {
             clone.querySelectorAll('[data-export-role="archive-title"]').forEach(el => {
                 el.style.lineHeight = '1.16';
                 el.style.letterSpacing = '0';
-                el.style.paddingBottom = '2px';
+                el.style.paddingBottom = '6px';
             });
 
             clone.querySelectorAll('[data-export-role="archive-stage"]').forEach(el => {
-                el.style.display = 'inline-flex';
-                el.style.alignItems = 'center';
-                el.style.justifyContent = 'center';
-                el.style.minHeight = '16px';
-                el.style.height = 'auto';
-                el.style.padding = '3px 9px';
-                el.style.lineHeight = '1.18';
+                el.style.display = 'inline-block';
+                el.style.minHeight = '0';
+                el.style.height = '18px';
+                el.style.padding = '0 9px';
+                el.style.lineHeight = '18px';
                 el.style.letterSpacing = '0.02em';
                 el.style.whiteSpace = 'nowrap';
+                el.style.marginTop = '2px';
             });
 
             clone.querySelectorAll('[data-export-role="archive-subtitle"]').forEach(el => {
@@ -14308,36 +14314,69 @@ function generateDailyStatus(checkins, dateStr) {
             });
 
             clone.querySelectorAll('[data-export-role="health-route-chip"]').forEach(el => {
-                el.style.display = 'inline-flex';
+                el.style.display = 'inline-grid';
+                el.style.gridTemplateColumns = '5px max-content max-content';
+                el.style.columnGap = '5px';
                 el.style.alignItems = 'center';
                 el.style.justifyContent = 'flex-start';
-                el.style.minHeight = '18px';
-                el.style.height = '18px';
+                el.style.minHeight = '20px';
+                el.style.height = '20px';
                 el.style.lineHeight = '1';
                 el.style.paddingTop = '0';
                 el.style.paddingBottom = '0';
+                el.style.paddingLeft = '9px';
+                el.style.paddingRight = '9px';
                 el.style.whiteSpace = 'nowrap';
+                el.style.overflow = 'visible';
             });
 
             clone.querySelectorAll('[data-export-role="route-chip-label"], [data-export-role="route-chip-title"]').forEach(el => {
-                el.style.display = 'inline-flex';
-                el.style.alignItems = 'center';
-                el.style.height = '100%';
+                el.style.display = 'block';
+                el.style.height = 'auto';
                 el.style.lineHeight = '1';
                 el.style.paddingTop = '0';
                 el.style.paddingBottom = '0';
                 el.style.whiteSpace = 'nowrap';
+                el.style.position = 'relative';
+                el.style.top = '-0.5px';
+            });
+
+            clone.querySelectorAll('[data-export-role="route-chip-dot"]').forEach(el => {
+                el.style.display = 'block';
+                el.style.flexShrink = '0';
+                el.style.marginTop = '0';
+            });
+
+            clone.querySelectorAll('[data-export-role="poster-pass-pill"]').forEach(el => {
+                el.style.display = 'inline-grid';
+                el.style.gridTemplateColumns = 'auto auto';
+                el.style.alignItems = 'center';
+                el.style.columnGap = '7px';
+                el.style.minHeight = '22px';
+                el.style.lineHeight = '1';
+                el.style.paddingTop = '0';
+                el.style.paddingBottom = '0';
+            });
+
+            clone.querySelectorAll('[data-export-role="poster-pass-label"]').forEach(el => {
+                el.style.display = 'block';
+                el.style.lineHeight = '1';
+                el.style.position = 'relative';
+                el.style.top = '-0.5px';
             });
 
             clone.querySelectorAll('[data-export-role="poster-stamp"]').forEach(el => {
-                el.style.display = 'inline-flex';
-                el.style.alignItems = 'center';
-                el.style.justifyContent = 'center';
-                el.style.height = '18px';
-                el.style.lineHeight = '1';
+                el.style.display = 'inline-block';
+                el.style.height = '22px';
+                el.style.minHeight = '22px';
+                el.style.lineHeight = '20px';
+                el.style.textAlign = 'center';
                 el.style.paddingTop = '0';
                 el.style.paddingBottom = '0';
+                el.style.paddingLeft = '12px';
+                el.style.paddingRight = '12px';
                 el.style.whiteSpace = 'nowrap';
+                el.style.fontSize = '7.5px';
             });
         }
 
@@ -14435,52 +14474,82 @@ function generateDailyStatus(checkins, dateStr) {
                                     -webkit-font-smoothing: antialiased !important;
                                     text-rendering: geometricPrecision !important;
                                     font-kerning: normal !important;
+                                    -webkit-text-size-adjust: 100% !important;
+                                    text-size-adjust: 100% !important;
+                                }
+                                [data-yejiu-export-card] * {
+                                    -webkit-text-size-adjust: 100% !important;
+                                    text-size-adjust: 100% !important;
+                                    font-variant-ligatures: none !important;
+                                    font-feature-settings: "liga" 0, "kern" 1 !important;
                                 }
                                 [data-yejiu-export-card] [data-export-role="archive-title"] {
                                     line-height: 1.16 !important;
                                     letter-spacing: 0 !important;
-                                    padding-bottom: 2px !important;
+                                    padding-bottom: 6px !important;
                                 }
                                 [data-yejiu-export-card] [data-export-role="archive-stage"] {
-                                    display: inline-flex !important;
-                                    align-items: center !important;
-                                    justify-content: center !important;
-                                    min-height: 16px !important;
-                                    height: auto !important;
-                                    padding: 3px 9px !important;
-                                    line-height: 1.18 !important;
+                                    display: inline-block !important;
+                                    min-height: 0 !important;
+                                    height: 18px !important;
+                                    padding: 0 9px !important;
+                                    line-height: 18px !important;
                                     letter-spacing: 0.02em !important;
                                     white-space: nowrap !important;
+                                    margin-top: 2px !important;
                                 }
                                 [data-yejiu-export-card] [data-export-role="health-route-chip"] {
-                                    display: inline-flex !important;
+                                    display: inline-grid !important;
+                                    grid-template-columns: 5px max-content max-content !important;
+                                    column-gap: 5px !important;
                                     align-items: center !important;
-                                    min-height: 18px !important;
-                                    height: 18px !important;
+                                    min-height: 20px !important;
+                                    height: 20px !important;
                                     line-height: 1 !important;
-                                    padding-top: 0 !important;
-                                    padding-bottom: 0 !important;
+                                    padding: 0 9px !important;
                                     white-space: nowrap !important;
+                                    overflow: visible !important;
                                 }
                                 [data-yejiu-export-card] [data-export-role="route-chip-label"],
                                 [data-yejiu-export-card] [data-export-role="route-chip-title"] {
-                                    display: inline-flex !important;
-                                    align-items: center !important;
-                                    height: 100% !important;
+                                    display: block !important;
+                                    height: auto !important;
                                     line-height: 1 !important;
                                     padding-top: 0 !important;
                                     padding-bottom: 0 !important;
                                     white-space: nowrap !important;
+                                    position: relative !important;
+                                    top: -0.5px !important;
+                                }
+                                [data-yejiu-export-card] [data-export-role="route-chip-dot"] {
+                                    display: block !important;
+                                    margin-top: 0 !important;
+                                }
+                                [data-yejiu-export-card] [data-export-role="poster-pass-pill"] {
+                                    display: inline-grid !important;
+                                    grid-template-columns: auto auto !important;
+                                    align-items: center !important;
+                                    column-gap: 7px !important;
+                                    min-height: 22px !important;
+                                    line-height: 1 !important;
+                                    padding-top: 0 !important;
+                                    padding-bottom: 0 !important;
+                                }
+                                [data-yejiu-export-card] [data-export-role="poster-pass-label"] {
+                                    display: block !important;
+                                    line-height: 1 !important;
+                                    position: relative !important;
+                                    top: -0.5px !important;
                                 }
                                 [data-yejiu-export-card] [data-export-role="poster-stamp"] {
-                                    display: inline-flex !important;
-                                    align-items: center !important;
-                                    justify-content: center !important;
-                                    height: 18px !important;
-                                    line-height: 1 !important;
-                                    padding-top: 0 !important;
-                                    padding-bottom: 0 !important;
+                                    display: inline-block !important;
+                                    height: 22px !important;
+                                    min-height: 22px !important;
+                                    line-height: 20px !important;
+                                    padding: 0 12px !important;
+                                    text-align: center !important;
                                     white-space: nowrap !important;
+                                    font-size: 7.5px !important;
                                 }
                             `;
                             clonedDoc.head.appendChild(style);
