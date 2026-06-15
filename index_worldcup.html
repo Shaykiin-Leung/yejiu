@@ -4654,15 +4654,9 @@ const CUSTOM_MATCH_ADVICE = {
         function toggleInfoModal() {
             const modal = document.getElementById('info-modal');
             if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                }, 10);
+                showTrackedModal(modal, 'info-modal');
             } else {
-                modal.classList.add('opacity-0');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 300);
+                hideTrackedModal(modal, 'info-modal');
             }
         }
 
@@ -4670,15 +4664,9 @@ const CUSTOM_MATCH_ADVICE = {
             const modal = document.getElementById('health-info-modal');
             if (!modal) return;
             if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                }, 10);
+                showTrackedModal(modal, 'health-info-modal');
             } else {
-                modal.classList.add('opacity-0');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 300);
+                hideTrackedModal(modal, 'health-info-modal');
             }
         }
 
@@ -4686,15 +4674,9 @@ const CUSTOM_MATCH_ADVICE = {
             const modal = document.getElementById('archive-info-modal');
             if (!modal) return;
             if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                }, 10);
+                showTrackedModal(modal, 'archive-info-modal');
             } else {
-                modal.classList.add('opacity-0');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 300);
+                hideTrackedModal(modal, 'archive-info-modal');
             }
         }
 
@@ -4702,16 +4684,9 @@ const CUSTOM_MATCH_ADVICE = {
             const modal = document.getElementById('feedback-modal');
             if (!modal) return;
             if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    refreshLucideIcons();
-                }, 10);
+                showTrackedModal(modal, 'feedback-modal', refreshLucideIcons);
             } else {
-                modal.classList.add('opacity-0');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 300);
+                hideTrackedModal(modal, 'feedback-modal');
             }
         }
 
@@ -6116,9 +6091,9 @@ const CUSTOM_MATCH_ADVICE = {
                                 <span style="font-size:7px;font-weight:700;color:rgba(255,255,255,0.68);letter-spacing:0.12em;text-transform:uppercase;font-family:'Outfit',sans-serif;">${_archiveLane.label} · POST MATCH</span>
                             </div>
                             <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
-                                <div style="font-size:26px; font-weight:700; color:#ffffff; letter-spacing:-0.03em; line-height:1.25;">${diagnosisTag}</div>
-                                ${milestoneTag ? `<div style="display:inline-flex; align-items:center; justify-content:center; font-size:8px; color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:2px 8px; letter-spacing:0.05em; font-family:'Outfit',sans-serif; line-height:1.2;">${milestoneTag}</div>` : ''}
-                                <div style="font-size:10px; color:rgba(255,255,255,0.38); line-height:1.45; max-width:250px; margin:0 auto;">${diagnosisTitle}</div>
+                                <div data-export-role="archive-title" style="font-size:26px; font-weight:700; color:#ffffff; letter-spacing:-0.03em; line-height:1.25;">${diagnosisTag}</div>
+                                ${milestoneTag ? `<div data-export-role="archive-stage" style="display:inline-flex; align-items:center; justify-content:center; font-size:8px; color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:2px 8px; letter-spacing:0.05em; font-family:'Outfit',sans-serif; line-height:1.2;">${milestoneTag}</div>` : ''}
+                                <div data-export-role="archive-subtitle" style="font-size:10px; color:rgba(255,255,255,0.38); line-height:1.45; max-width:250px; margin:0 auto;">${diagnosisTitle}</div>
                             </div>
                         </div>
 
@@ -6624,6 +6599,144 @@ function closeEmergencyModal() {
         if (currentDailyArchiveFilter === 'rare') currentDailyArchiveFilter = 'special';
         let currentDailyStageFilter = localStorage.getItem('worldcup_daily_stage_filter') || 'all';
 
+        const YEJIU_APP_VIEWS = ['home', 'health', 'archives', 'profile'];
+        let yejiuHistoryReady = false;
+        let yejiuApplyingHistoryState = false;
+
+        function normalizeAppView(view) {
+            return YEJIU_APP_VIEWS.includes(view) ? view : 'home';
+        }
+
+        function appHashForView(view) {
+            return '#' + normalizeAppView(view);
+        }
+
+        function initAppHistory(initialView) {
+            const view = normalizeAppView(initialView);
+            yejiuHistoryReady = true;
+            try {
+                history.replaceState({ yejiuApp: true, view }, '', appHashForView(view));
+            } catch (err) {
+                console.warn('Yejiu history init failed:', err);
+            }
+        }
+
+        function syncAppHistory(view, mode = 'push') {
+            if (!yejiuHistoryReady || yejiuApplyingHistoryState) return;
+            const nextView = normalizeAppView(view);
+            const nextUrl = appHashForView(nextView);
+            const currentState = history.state || {};
+            try {
+                if (mode === 'replace') {
+                    history.replaceState({ yejiuApp: true, view: nextView }, '', nextUrl);
+                    return;
+                }
+                if (currentState.yejiuApp && currentState.view === nextView && !currentState.overlay && window.location.hash === nextUrl) {
+                    return;
+                }
+                history.pushState({ yejiuApp: true, view: nextView }, '', nextUrl);
+            } catch (err) {
+                console.warn('Yejiu history sync failed:', err);
+            }
+        }
+
+        function pushAppOverlayState(overlay) {
+            if (!yejiuHistoryReady || yejiuApplyingHistoryState || !overlay) return;
+            const state = history.state || {};
+            if (state.yejiuApp && state.overlay === overlay && state.view === currentView) return;
+            try {
+                history.pushState({ yejiuApp: true, view: normalizeAppView(currentView), overlay }, '', appHashForView(currentView));
+            } catch (err) {
+                console.warn('Yejiu overlay history failed:', err);
+            }
+        }
+
+        function closeOverlayByHistory(overlayName) {
+            const state = history.state || {};
+            if (!yejiuApplyingHistoryState && state.yejiuApp && state.overlay === overlayName) {
+                history.back();
+                return true;
+            }
+            return false;
+        }
+
+        function showTrackedModal(modal, overlayName, afterOpen) {
+            if (!modal || !modal.classList.contains('hidden')) return;
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                if (typeof afterOpen === 'function') afterOpen();
+            }, 10);
+            pushAppOverlayState(overlayName);
+        }
+
+        function hideTrackedModal(modal, overlayName, afterClose) {
+            if (!modal || modal.classList.contains('hidden')) return;
+            if (closeOverlayByHistory(overlayName)) return;
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (typeof afterClose === 'function') afterClose();
+            }, 300);
+        }
+
+        function closeVisibleAppOverlay() {
+            const posterSheet = document.getElementById('poster-share-sheet');
+            if (posterSheet) {
+                posterSheet.remove();
+                return true;
+            }
+
+            if (typeof isHealthAdjustSheetOpen === 'function' && isHealthAdjustSheetOpen()) {
+                closeHealthAdjustSheet();
+                return true;
+            }
+
+            const personaModal = document.getElementById('persona-share-modal');
+            if (personaModal) {
+                personaModal.remove();
+                return true;
+            }
+
+            const avatarModal = document.getElementById('avatar-selector-modal');
+            if (avatarModal && !avatarModal.classList.contains('hidden')) {
+                avatarModal.classList.remove('flex');
+                avatarModal.classList.add('hidden');
+                return true;
+            }
+
+            const syncModal = document.getElementById('yejiu-sync-modal');
+            if (syncModal && !syncModal.classList.contains('hidden')) {
+                syncModal.classList.remove('flex');
+                syncModal.classList.add('hidden');
+                return true;
+            }
+
+            const trackedModals = ['feedback-modal', 'archive-info-modal', 'health-info-modal', 'info-modal'];
+            for (const id of trackedModals) {
+                const modal = document.getElementById(id);
+                if (modal && !modal.classList.contains('hidden')) {
+                    modal.classList.add('opacity-0');
+                    modal.classList.add('hidden');
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        window.addEventListener('popstate', (event) => {
+            const state = event.state || {};
+            const nextView = normalizeAppView(state.view || window.location.hash.replace('#', '') || 'home');
+            yejiuApplyingHistoryState = true;
+            try {
+                closeVisibleAppOverlay();
+                switchView(nextView, { history: 'skip', scroll: false });
+            } finally {
+                yejiuApplyingHistoryState = false;
+            }
+        });
+
         const WORLDCUP_HOST_ACCENTS = {
             red: '#c94b5d',
             green: '#2f8f62',
@@ -7099,7 +7212,8 @@ function closeEmergencyModal() {
             document.addEventListener('scroll', clearPressed, { passive: true });
         }
 
-        function switchView(view) {
+        function switchView(view, options = {}) {
+            view = normalizeAppView(view);
             currentView = view;
             const allViews = ['home', 'health', 'archives', 'profile'];
             allViews.forEach(v => {
@@ -7141,7 +7255,12 @@ function closeEmergencyModal() {
             if (view === 'profile') renderProfileView();
             if (view === 'home') { renderMatches(); renderStats(); }
 
-            window.scrollTo({ top: 0, behavior: 'instant' });
+            if (options.scroll !== false) {
+                window.scrollTo({ top: 0, behavior: 'instant' });
+            }
+            if (options.history !== 'skip') {
+                syncAppHistory(view, options.history || 'push');
+            }
             playViewEntrance(view);
             refreshLucideIcons();
         }
@@ -7343,11 +7462,13 @@ function closeEmergencyModal() {
         function openHealthAdjustSheet() {
             const sheet = document.getElementById('health-adjust-sheet');
             if (!sheet) return;
+            const wasHidden = sheet.classList.contains('hidden');
             if (sheet.parentElement !== document.body) {
                 document.body.appendChild(sheet);
             }
             sheet.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            if (wasHidden) pushAppOverlayState('health-adjust-sheet');
             refreshLucideIcons();
         }
 
@@ -7368,6 +7489,7 @@ function closeEmergencyModal() {
         function closeHealthAdjustSheet() {
             const sheet = document.getElementById('health-adjust-sheet');
             if (!sheet) return;
+            if (!sheet.classList.contains('hidden') && closeOverlayByHistory('health-adjust-sheet')) return;
             sheet.classList.add('hidden');
             document.body.style.overflow = '';
         }
@@ -12800,8 +12922,10 @@ function generateDailyStatus(checkins, dateStr) {
                     `;
                 }).join('');
 
+                const wasHidden = modal.classList.contains('hidden');
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
+                if (wasHidden) pushAppOverlayState('avatar-selector-modal');
             }
         }
 
@@ -12809,6 +12933,7 @@ function generateDailyStatus(checkins, dateStr) {
         function closeAvatarSelector() {
             const modal = document.getElementById('avatar-selector-modal');
             if (modal) {
+                if (!modal.classList.contains('hidden') && closeOverlayByHistory('avatar-selector-modal')) return;
                 modal.classList.remove('flex');
                 modal.classList.add('hidden');
             }
@@ -12849,8 +12974,10 @@ function generateDailyStatus(checkins, dateStr) {
                 const importInput = document.getElementById('sync-import-input');
                 if (importInput) importInput.value = '';
 
+                const wasHidden = modal.classList.contains('hidden');
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
+                if (wasHidden) pushAppOverlayState('yejiu-sync-modal');
                 refreshLucideIcons();
             }
         }
@@ -12858,6 +12985,7 @@ function generateDailyStatus(checkins, dateStr) {
         function closeSyncModal() {
             const modal = document.getElementById('yejiu-sync-modal');
             if (modal) {
+                if (!modal.classList.contains('hidden') && closeOverlayByHistory('yejiu-sync-modal')) return;
                 modal.classList.remove('flex');
                 modal.classList.add('hidden');
             }
@@ -13360,6 +13488,7 @@ function generateDailyStatus(checkins, dateStr) {
                     ? window.location.hash.replace('#', '')
                     : 'home';
                 switchView(initialView);       // 默认展示首页；支持 #profile 等深链返回
+                initAppHistory(initialView);
                 checkPWAPrompt();
                 checkMorningPopup();      // 保留旧调用兼容（已空壳化）
                 checkPendingCheckins();   // ★ 新：完赛打卡弹窗检测主入口
@@ -13552,10 +13681,10 @@ function generateDailyStatus(checkins, dateStr) {
                     { label: 'OFF', title: '看完断网回收', desc: routeWrapText, color: hostAccents.green }
                 ];
             const routeStepChipsHTML = mapSteps.map((step) => `
-                <span style="display:inline-flex; align-items:center; height:18px; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.025); border-radius:999px; padding:0 8px; box-sizing:border-box; line-height:1; gap:5px; min-width:0; max-width:100%;">
+                <span data-export-role="health-route-chip" style="display:inline-flex; align-items:center; height:18px; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.025); border-radius:999px; padding:0 8px; box-sizing:border-box; line-height:1; gap:5px; min-width:0; max-width:100%;">
                     <span style="width:5px; height:5px; border-radius:999px; background:${step.color}; box-shadow:0 0 10px ${step.color}55; flex-shrink:0; display:inline-block;"></span>
-                    <span style="font-size:7.5px; color:rgba(255,255,255,0.52); font-family:'Outfit',sans-serif; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; flex-shrink:0; line-height:1; display:inline-block;">${safe(step.label)}</span>
-                    <span style="font-size:8px; color:rgba(255,255,255,0.72); font-family:'Noto Sans SC','Outfit',sans-serif; font-weight:900; white-space:nowrap; line-height:1; display:inline-block;">${safe(step.title)}</span>
+                    <span data-export-role="route-chip-label" style="font-size:7.5px; color:rgba(255,255,255,0.52); font-family:'Outfit',sans-serif; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; flex-shrink:0; line-height:1; display:inline-block;">${safe(step.label)}</span>
+                    <span data-export-role="route-chip-title" style="font-size:8px; color:rgba(255,255,255,0.72); font-family:'Noto Sans SC','Outfit',sans-serif; font-weight:900; white-space:nowrap; line-height:1; display:inline-block;">${safe(step.title)}</span>
                 </span>
             `).join('');
             const shareCTA = realtimeCount === 0 ? '把体力留给下一场' : '把热爱花在值得看的那一场';
@@ -13671,7 +13800,7 @@ function generateDailyStatus(checkins, dateStr) {
                                         <div style="font-size:6.5px; color:rgba(255,255,255,0.22); line-height:1.35; margin-top:2px;">扫码生成你的护航卡</div>
                                     </div>
                                 </div>
-                                <div style="font-size:8px; color:${accentColor}; font-weight:900; text-transform:uppercase; border:1.5px solid ${accentColor}; border-radius:999px; height:18px; padding:0 10px; box-sizing:border-box; transform:rotate(-5deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px ${accentColor}42, inset 0 0 8px ${accentColor}16; background:rgba(0,0,0,0.25);">${stampText}</div>
+                                <div data-export-role="poster-stamp" style="font-size:8px; color:${accentColor}; font-weight:900; text-transform:uppercase; border:1.5px solid ${accentColor}; border-radius:999px; height:18px; padding:0 10px; box-sizing:border-box; transform:rotate(-5deg); display:inline-flex; align-items:center; justify-content:center; line-height:1; font-family:'Outfit',sans-serif; letter-spacing:0.1em; box-shadow:0 0 14px ${accentColor}42, inset 0 0 8px ${accentColor}16; background:rgba(0,0,0,0.25);">${stampText}</div>
                             </div>
                         </div>
                         <div style="height:2px; background:${hostRibbon}; opacity:0.82;"></div>
@@ -13749,21 +13878,25 @@ function generateDailyStatus(checkins, dateStr) {
 
             const shareOriginalHTML = btn ? btn.innerHTML : '';
             if (btn) {
-                btn.innerHTML = '<span style="margin-right:6px">⌛</span> 正在生成海报...';
+                btn.innerHTML = '<span style="margin-right:6px">⌛</span> 打开保存面板...';
                 btn.disabled = true;
                 btn.style.opacity = '0.76';
             }
             try {
-                const dataUrl = await renderPosterCardDataUrl(cardId);
-                openPosterShareSheet(cardId, fileName, dataUrl);
+                const shareId = openPosterShareSheet(cardId, fileName, null);
+                if (shareId) {
+                    requestAnimationFrame(() => preloadPosterImageForShare(shareId));
+                }
             } catch (err) {
-                console.warn('Poster render before share failed:', err);
-                showToast('海报生成失败，请稍后再试');
+                console.warn('Open poster share sheet failed:', err);
+                showToast('打开保存面板失败，请稍后再试');
             } finally {
                 if (btn) {
-                    btn.innerHTML = shareOriginalHTML;
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
+                    setTimeout(() => {
+                        btn.innerHTML = shareOriginalHTML;
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                    }, 180);
                 }
             }
             return;
@@ -14045,6 +14178,7 @@ function generateDailyStatus(checkins, dateStr) {
             const clone = card.cloneNode(true);
             clone.removeAttribute('id');
             clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            clone.setAttribute('data-yejiu-export-card', cardId || 'poster');
             clone.style.width = '360px';
             clone.style.maxWidth = 'none';
             clone.style.minWidth = '360px';
@@ -14072,7 +14206,139 @@ function generateDailyStatus(checkins, dateStr) {
             }
 
             copyCanvasContentToClone(card, clone);
+            stabilizePosterExportClone(clone, cardId, false);
             return clone;
+        }
+
+        function stabilizePosterExportClone(clone, cardId, useComputed = false) {
+            if (!clone) return;
+
+            const textFont = "'Outfit', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif";
+            const monoFont = "'SFMono-Regular', 'Roboto Mono', 'Consolas', monospace";
+            const nodes = [clone, ...Array.from(clone.querySelectorAll('*'))];
+
+            clone.style.webkitFontSmoothing = 'antialiased';
+            clone.style.textRendering = 'geometricPrecision';
+            clone.style.fontKerning = 'normal';
+            clone.style.contain = 'layout paint style';
+
+            const getFontSize = (el, computed) => {
+                const inlineSize = (el.style && el.style.fontSize) || '';
+                const inlineMatch = inlineSize.match(/([\d.]+)px/);
+                if (inlineMatch) return Number(inlineMatch[1]);
+                const computedSize = computed && computed.fontSize ? computed.fontSize.match(/([\d.]+)px/) : null;
+                return computedSize ? Number(computedSize[1]) : 0;
+            };
+
+            nodes.forEach(el => {
+                if (!el || !el.style) return;
+                const computed = useComputed ? window.getComputedStyle(el) : null;
+                const styleDisplay = el.style.display || (computed ? computed.display : '');
+                const styleText = el.getAttribute('style') || '';
+                const text = (el.textContent || '').replace(/\s+/g, ' ').trim();
+                const fontSize = getFontSize(el, computed);
+                const hasCJK = /[\u3400-\u9fff]/.test(text);
+
+                el.style.boxSizing = 'border-box';
+                el.style.webkitFontSmoothing = 'antialiased';
+                el.style.textRendering = 'geometricPrecision';
+
+                if (el !== clone && (styleDisplay.includes('inline-flex') || /align-items\s*:/.test(styleText) || el.hasAttribute('data-export-role'))) {
+                    el.style.alignItems = el.style.alignItems || 'center';
+                    el.style.minHeight = el.style.minHeight || '0';
+                }
+
+                if (!text) return;
+
+                if (hasCJK) {
+                    const computedFont = computed ? computed.fontFamily : (el.style.fontFamily || '');
+                    if (!/mono/i.test(computedFont)) {
+                        el.style.fontFamily = textFont;
+                    }
+                    if (fontSize >= 10) {
+                        el.style.letterSpacing = '0';
+                    }
+                } else if (/^[A-Z0-9\s./·:_-]+$/.test(text) && fontSize <= 10) {
+                    el.style.fontFamily = monoFont;
+                }
+
+                if (fontSize > 0 && fontSize <= 9.5) {
+                    el.style.lineHeight = '1.16';
+                }
+
+                if (fontSize >= 22 && hasCJK) {
+                    el.style.lineHeight = cardId === 'poster-card' ? '1.18' : '1.16';
+                    el.style.paddingBottom = '2px';
+                    el.style.letterSpacing = '0';
+                }
+
+                if (/^(REST ROUTE|REST LOG|NIGHT LOG|LOGGED|PLOT LOG|GUIDED|APPROVED|HIGH LOAD)$/i.test(text)) {
+                    el.style.display = 'inline-flex';
+                    el.style.alignItems = 'center';
+                    el.style.justifyContent = 'center';
+                    el.style.lineHeight = '1';
+                    el.style.paddingTop = '0';
+                    el.style.paddingBottom = '0';
+                    el.style.whiteSpace = 'nowrap';
+                }
+            });
+
+            clone.querySelectorAll('[data-export-role="archive-title"]').forEach(el => {
+                el.style.lineHeight = '1.16';
+                el.style.letterSpacing = '0';
+                el.style.paddingBottom = '2px';
+            });
+
+            clone.querySelectorAll('[data-export-role="archive-stage"]').forEach(el => {
+                el.style.display = 'inline-flex';
+                el.style.alignItems = 'center';
+                el.style.justifyContent = 'center';
+                el.style.minHeight = '16px';
+                el.style.height = 'auto';
+                el.style.padding = '3px 9px';
+                el.style.lineHeight = '1.18';
+                el.style.letterSpacing = '0.02em';
+                el.style.whiteSpace = 'nowrap';
+            });
+
+            clone.querySelectorAll('[data-export-role="archive-subtitle"]').forEach(el => {
+                el.style.lineHeight = '1.45';
+                el.style.letterSpacing = '0';
+                el.style.paddingTop = '1px';
+            });
+
+            clone.querySelectorAll('[data-export-role="health-route-chip"]').forEach(el => {
+                el.style.display = 'inline-flex';
+                el.style.alignItems = 'center';
+                el.style.justifyContent = 'flex-start';
+                el.style.minHeight = '18px';
+                el.style.height = '18px';
+                el.style.lineHeight = '1';
+                el.style.paddingTop = '0';
+                el.style.paddingBottom = '0';
+                el.style.whiteSpace = 'nowrap';
+            });
+
+            clone.querySelectorAll('[data-export-role="route-chip-label"], [data-export-role="route-chip-title"]').forEach(el => {
+                el.style.display = 'inline-flex';
+                el.style.alignItems = 'center';
+                el.style.height = '100%';
+                el.style.lineHeight = '1';
+                el.style.paddingTop = '0';
+                el.style.paddingBottom = '0';
+                el.style.whiteSpace = 'nowrap';
+            });
+
+            clone.querySelectorAll('[data-export-role="poster-stamp"]').forEach(el => {
+                el.style.display = 'inline-flex';
+                el.style.alignItems = 'center';
+                el.style.justifyContent = 'center';
+                el.style.height = '18px';
+                el.style.lineHeight = '1';
+                el.style.paddingTop = '0';
+                el.style.paddingBottom = '0';
+                el.style.whiteSpace = 'nowrap';
+            });
         }
 
         function mountPosterClonePreview(slot, card, cardId) {
@@ -14125,6 +14391,15 @@ function generateDailyStatus(checkins, dateStr) {
             ]);
         }
 
+        async function waitForPosterFonts(timeout = 650) {
+            if (!document.fonts || !document.fonts.ready) return;
+            try {
+                await withPosterTimeout(document.fonts.ready, timeout, 'poster font timeout');
+            } catch (err) {
+                // Font readiness is a quality improvement, not a blocker for saving.
+            }
+        }
+
         async function renderPosterCardDataUrl(cardId) {
             const card = document.getElementById(cardId);
             if (!card) throw new Error('没有找到海报卡片');
@@ -14135,22 +14410,83 @@ function generateDailyStatus(checkins, dateStr) {
             document.body.appendChild(renderRoot);
 
             try {
-                await waitForPosterImages(clone, 2200);
+                await waitForPosterFonts(650);
+                stabilizePosterExportClone(clone, cardId, true);
+                await waitForPosterImages(clone, 1200);
                 await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
                 if (typeof html2canvas !== 'function') {
                     throw new Error('html2canvas 未加载');
                 }
+                const isMobilePoster = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                const exportScale = isMobilePoster ? 1.6 : Math.min(2, window.devicePixelRatio || 2);
                 const canvas = await withPosterTimeout(
                     html2canvas(clone, {
                         backgroundColor: '#000000',
-                        scale: Math.min(2, window.devicePixelRatio || 2),
+                        scale: exportScale,
                         useCORS: true,
                         allowTaint: true,
                         logging: false,
-                        imageTimeout: 2000,
-                        removeContainer: true
+                        imageTimeout: 1200,
+                        removeContainer: true,
+                        onclone: (clonedDoc) => {
+                            const style = clonedDoc.createElement('style');
+                            style.textContent = `
+                                [data-yejiu-export-card] {
+                                    -webkit-font-smoothing: antialiased !important;
+                                    text-rendering: geometricPrecision !important;
+                                    font-kerning: normal !important;
+                                }
+                                [data-yejiu-export-card] [data-export-role="archive-title"] {
+                                    line-height: 1.16 !important;
+                                    letter-spacing: 0 !important;
+                                    padding-bottom: 2px !important;
+                                }
+                                [data-yejiu-export-card] [data-export-role="archive-stage"] {
+                                    display: inline-flex !important;
+                                    align-items: center !important;
+                                    justify-content: center !important;
+                                    min-height: 16px !important;
+                                    height: auto !important;
+                                    padding: 3px 9px !important;
+                                    line-height: 1.18 !important;
+                                    letter-spacing: 0.02em !important;
+                                    white-space: nowrap !important;
+                                }
+                                [data-yejiu-export-card] [data-export-role="health-route-chip"] {
+                                    display: inline-flex !important;
+                                    align-items: center !important;
+                                    min-height: 18px !important;
+                                    height: 18px !important;
+                                    line-height: 1 !important;
+                                    padding-top: 0 !important;
+                                    padding-bottom: 0 !important;
+                                    white-space: nowrap !important;
+                                }
+                                [data-yejiu-export-card] [data-export-role="route-chip-label"],
+                                [data-yejiu-export-card] [data-export-role="route-chip-title"] {
+                                    display: inline-flex !important;
+                                    align-items: center !important;
+                                    height: 100% !important;
+                                    line-height: 1 !important;
+                                    padding-top: 0 !important;
+                                    padding-bottom: 0 !important;
+                                    white-space: nowrap !important;
+                                }
+                                [data-yejiu-export-card] [data-export-role="poster-stamp"] {
+                                    display: inline-flex !important;
+                                    align-items: center !important;
+                                    justify-content: center !important;
+                                    height: 18px !important;
+                                    line-height: 1 !important;
+                                    padding-top: 0 !important;
+                                    padding-bottom: 0 !important;
+                                    white-space: nowrap !important;
+                                }
+                            `;
+                            clonedDoc.head.appendChild(style);
+                        }
                     }),
-                    10000,
+                    6500,
                     '生成超时'
                 );
                 return canvas.toDataURL('image/png');
@@ -14161,7 +14497,7 @@ function generateDailyStatus(checkins, dateStr) {
 
         function openPosterShareSheetV2(cardId, fileName, dataUrl) {
             const card = document.getElementById(cardId);
-            if (!card) { showToast('没有找到可分享的海报卡片'); return; }
+            if (!card) { showToast('没有找到可分享的海报卡片'); return null; }
 
             closePosterShareSheet();
             const payload = buildPosterSharePayload(card, fileName);
@@ -14194,6 +14530,7 @@ function generateDailyStatus(checkins, dateStr) {
                 <button type="button" onclick="closePosterShareSheet()" style="width:48px; height:48px; border-radius:999px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.08); color:#fff; font-size:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:22px; outline:none; transition:all 0.1s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">×</button>
             `;
             document.body.appendChild(modal);
+            pushAppOverlayState('poster-share-sheet');
             const previewSlot = modal.querySelector('.poster-share-preview-slot');
             if (previewSlot && dataUrl) {
                 previewSlot.innerHTML = `
@@ -14214,12 +14551,13 @@ function generateDailyStatus(checkins, dateStr) {
                 });
             } else if (previewSlot) {
                 mountPosterClonePreview(previewSlot, card, cardId);
+                setTimeout(() => setPosterSaveButtonState(shareId, 'loading', '准备图片'), 0);
             }
+            return shareId;
         }
 
         function openPosterShareSheet(cardId, fileName, dataUrl) {
-            openPosterShareSheetV2(cardId, fileName, dataUrl);
-            return;
+            return openPosterShareSheetV2(cardId, fileName, dataUrl);
             const card = document.getElementById(cardId);
             if (!card) { showToast('没有找到可分享的海报卡片'); return; }
 
@@ -14254,6 +14592,7 @@ function generateDailyStatus(checkins, dateStr) {
 
         function closePosterShareSheet() {
             const modal = document.getElementById('poster-share-sheet');
+            if (modal && closeOverlayByHistory('poster-share-sheet')) return;
             if (modal) modal.remove();
         }
 

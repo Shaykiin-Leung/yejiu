@@ -19,3 +19,11 @@ index_worldcup_preview.html
 # OS
 .DS_Store
 Thumbs.db
+
+# Offline build artifacts
+yejiu_offline_release.apk
+配置和打包助手.py
+
+# HBuilderX specific ignores
+**/unpackage/
+**/.hbuilderx/
