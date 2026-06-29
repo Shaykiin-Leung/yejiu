@@ -15461,13 +15461,9 @@ function generateDailyStatus(checkins, dateStr) {
             
             content.innerHTML = `
                 <div class="space-y-5 relative">
-                    <!-- Glass backdrop glow decorative spots inside the modal -->
-                    <div class="absolute -top-10 -left-10 w-24 h-24 bg-[#00e676]/05 blur-3xl pointer-events-none rounded-full"></div>
-                    <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-blue-500/05 blur-3xl pointer-events-none rounded-full"></div>
-
                     <!-- Header -->
-                    <div class="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-                        <span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/[0.05]">
+                        <span class="text-[10px] font-black text-zinc-550 uppercase tracking-widest">
                             W${match.id} · ${isEn ? match.stage.trim() : match.stage.trim()}
                         </span>
                         <div class="px-2.5 py-0.5 rounded-full border text-[9px] font-bold flex items-center gap-1.5 ${warningBgClass} ${warningTextClass}">
@@ -15476,59 +15472,59 @@ function generateDailyStatus(checkins, dateStr) {
                         </div>
                     </div>
                     
-                    <!-- Team Duel (Premium Card) -->
-                    <div class="py-4 px-3 bg-white/[0.02] border border-white/[0.04] rounded-2xl flex items-center justify-center gap-4">
+                    <!-- Team Duel (Deep Dark Minimalist Card) -->
+                    <div class="py-4 px-3 bg-zinc-950/40 border border-white/[0.03] rounded-2xl flex items-center justify-center gap-4">
                         <div class="flex flex-col items-center gap-2 flex-1 min-w-0">
-                            <div class="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-3xl shadow-inner active:scale-95 transition-all">
+                            <div class="w-12 h-12 rounded-xl bg-zinc-900/40 border border-white/[0.04] flex items-center justify-center text-3xl shadow-inner active:scale-95 transition-all">
                                 ${match.flagA || '🏳️'}
                             </div>
-                            <span class="text-xs font-black text-white/90 truncate text-center w-full">${match.teamA || (isEn ? 'TBD' : '未定')}</span>
+                            <span class="text-xs font-black text-zinc-400 truncate text-center w-full">${match.teamA || (isEn ? 'TBD' : '未定')}</span>
                         </div>
                         
                         <div class="flex flex-col items-center shrink-0 px-2">
-                            <div class="px-3.5 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-xl flex items-center justify-center shadow-lg">
-                                <span class="text-xl font-black text-white font-mono tracking-widest">
+                            <div class="px-3.5 py-1.5 bg-zinc-900/30 border border-white/[0.03] rounded-xl flex items-center justify-center shadow-md">
+                                <span class="text-xl font-bold text-zinc-200 font-mono tracking-widest">
                                     ${Number.isFinite(match.scoreA) ? match.scoreA : '-'} : ${Number.isFinite(match.scoreB) ? match.scoreB : '-'}
                                 </span>
                             </div>
-                            <span class="text-[8px] text-zinc-500 font-extrabold uppercase tracking-widest mt-1.5">VS</span>
+                            <span class="text-[8px] text-zinc-650 font-bold uppercase tracking-widest mt-1.5">VS</span>
                         </div>
                         
                         <div class="flex flex-col items-center gap-2 flex-1 min-w-0">
-                            <div class="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-3xl shadow-inner active:scale-95 transition-all">
+                            <div class="w-12 h-12 rounded-xl bg-zinc-900/40 border border-white/[0.04] flex items-center justify-center text-3xl shadow-inner active:scale-95 transition-all">
                                 ${match.flagB || '🏳️'}
                             </div>
-                            <span class="text-xs font-black text-white/90 truncate text-center w-full">${match.teamB || (isEn ? 'TBD' : '未定')}</span>
+                            <span class="text-xs font-black text-zinc-400 truncate text-center w-full">${match.teamB || (isEn ? 'TBD' : '未定')}</span>
                         </div>
                     </div>
                     
                     <!-- Match Time -->
-                    <div class="bg-white/[0.03] border border-white/[0.06] p-3 rounded-2xl flex items-center gap-3 transition hover:bg-white/[0.05]">
-                        <div class="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-zinc-400 shrink-0">
+                    <div class="bg-zinc-950/40 border border-white/[0.03] p-3 rounded-2xl flex items-center gap-3 transition hover:bg-zinc-900/40">
+                        <div class="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-zinc-550 shrink-0">
                             <i data-lucide="clock" class="w-4 h-4"></i>
                         </div>
                         <div class="text-left">
-                            <div class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider leading-none">${isEn ? 'Match Time' : '比赛时间'}</div>
-                            <div class="text-[11px] font-black text-white mt-1.5 leading-none tracking-wide">${timeInfo.bjTimeStr}</div>
+                            <div class="text-[9px] text-zinc-650 font-bold uppercase tracking-wider leading-none">${isEn ? 'Match Time' : '比赛时间'}</div>
+                            <div class="text-[11px] font-bold text-zinc-300 mt-1.5 leading-none tracking-wide">${timeInfo.bjTimeStr}</div>
                         </div>
                     </div>
                     
-                    <!-- Match Aspect (With colored left-accent border matching the warning type) -->
-                    <div class="space-y-1.5 text-left border-l-2 pl-3 ${warningTextClass.includes('rose') ? 'border-rose-500/80' : warningTextClass.includes('amber') ? 'border-amber-500/80' : 'border-emerald-500/80'}">
+                    <!-- Match Aspect (With clean left border) -->
+                    <div class="space-y-1.5 text-left border-l border-zinc-800 pl-3">
                         <div class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider leading-none">${isEn ? 'Match Aspect' : '对决看点'}</div>
                         <p class="text-[11px] text-zinc-300 leading-relaxed font-semibold mt-1">${adviceDetails.aspect}</p>
                     </div>
                     
                     <!-- Health Advice -->
-                    <div class="space-y-1.5 text-left border-l-2 pl-3 border-zinc-700/60 bg-zinc-900/20 p-2.5 rounded-r-xl">
+                    <div class="space-y-1.5 text-left border-l border-zinc-800 pl-3">
                         <div class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider leading-none">${isEn ? 'Health Advice' : '健康建议'}</div>
                         <p class="text-[11px] text-zinc-400 leading-relaxed mt-1 font-medium">${adviceDetails.prescription}</p>
                     </div>
                     
                     <!-- Action Button -->
                     <div class="pt-2">
-                        <button id="modal-sub-btn-${match.id}" onclick="toggleModalSubscription(${match.id}, event)" class="w-full py-3.5 rounded-2xl text-[11px] font-black active:scale-[0.97] transition-all duration-300 flex items-center justify-center gap-2 ${isSubbed ? 'bg-zinc-900/60 border border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700' : 'bg-gradient-to-r from-[#00e676] to-[#00b0ff] text-black font-extrabold hover:brightness-110 hover:shadow-[0_6px_24px_rgba(0,230,118,0.25)]'}">
-                            <i data-lucide="${isSubbed ? 'bell-off' : 'bell'}" class="w-3.5 h-3.5 ${!isSubbed ? 'animate-bounce' : ''}"></i>
+                        <button id="modal-sub-btn-${match.id}" onclick="toggleModalSubscription(${match.id}, event)" class="w-full py-3.5 rounded-2xl text-[11px] font-black active:scale-[0.97] transition-all duration-300 flex items-center justify-center gap-2 ${isSubbed ? 'bg-zinc-950/40 border border-zinc-900/60 text-zinc-550 hover:text-zinc-400 hover:border-zinc-800' : 'bg-white/[0.06] border border-white/[0.08] text-white hover:bg-white/[0.1] hover:border-white/[0.15]'}">
+                            <i data-lucide="${isSubbed ? 'bell-off' : 'bell'}" class="w-3.5 h-3.5"></i>
                             <span>${isSubbed ? (isEn ? 'Unsubscribe' : '取消提醒') : (isEn ? 'Subscribe' : '订阅提醒')}</span>
                         </button>
                     </div>
