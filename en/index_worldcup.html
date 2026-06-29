@@ -1055,6 +1055,162 @@
                 mask-image: none !important;
             }
         }
+
+        /* ── 淘汰赛对阵图 View Mode Toggle ── */
+        .bracket-toggle-container {
+            margin-bottom: 0.5rem;
+        }
+        .yejiu-bracket-board {
+            display: flex;
+            overflow-x: auto;
+            gap: 1.5rem;
+            padding: 1.5rem 0.5rem;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .yejiu-bracket-board::-webkit-scrollbar {
+            height: 4px;
+        }
+        .yejiu-bracket-board::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 2px;
+        }
+        .yejiu-bracket-board::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+        .bracket-column {
+            flex: 0 0 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            position: relative;
+            scroll-snap-align: start;
+        }
+        .bracket-round-title {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.35rem 0.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .bracket-match-node {
+            position: relative;
+            padding: 0.75rem 0;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .bracket-match-card {
+            width: 100%;
+            background: rgba(18, 18, 18, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 0.75rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        .bracket-match-card:hover {
+            border-color: rgba(0, 230, 118, 0.4);
+            background: rgba(24, 24, 24, 0.7);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 230, 118, 0.1);
+        }
+        .bracket-match-card.subbed {
+            border-color: rgba(0, 230, 118, 0.3);
+            box-shadow: 0 0 12px rgba(0, 230, 118, 0.08);
+        }
+        .bracket-team-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 700;
+            color: #71717a;
+            line-height: 1.4;
+        }
+        .bracket-team-row.winner {
+            color: #ffffff;
+        }
+        .bracket-team-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+        .bracket-team-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .bracket-team-score {
+            font-family: monospace;
+            font-weight: 800;
+            font-size: 13px;
+            color: #71717a;
+            padding-left: 0.5rem;
+        }
+        .bracket-team-row.winner .bracket-team-score {
+            color: #00e676;
+        }
+        .bracket-card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: 0.5rem;
+            font-size: 9px;
+            font-weight: 600;
+            color: #52525b;
+        }
+        .bracket-match-card.finished .bracket-card-meta {
+            color: #3f3f46;
+        }
+        
+        /* ── Bracket Connector Lines ── */
+        .bracket-column:not(:last-child) .bracket-match-node::after {
+            content: '';
+            position: absolute;
+            right: -0.75rem;
+            top: 50%;
+            width: 0.75rem;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            z-index: 1;
+        }
+        .bracket-column:not(:first-child) .bracket-match-node::before {
+            content: '';
+            position: absolute;
+            left: -0.75rem;
+            top: 50%;
+            width: 0.75rem;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            z-index: 1;
+        }
+
+        /* ── Glassmorphism Modal ── */
+        .yejiu-match-modal-backdrop {
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .yejiu-match-modal-box {
+            background-color: rgba(20, 20, 20, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8);
+        }
 </style>
 </head>
 <body class="bg-black text-white font-sans antialiased selection:bg-zinc-800 selection:text-white">
@@ -1376,7 +1532,21 @@
             </div>
         </section>
 
-        <!-- Horizontal Date Swiper (横向日期选择器) -->
+        
+        <!-- View Mode Toggle (List / Bracket) -->
+        <div class="px-5 pt-4">
+            <div class="bg-[#121212]/50 backdrop-blur-md border border-[#222222]/80 p-1 rounded-2xl flex gap-1">
+                <button id="toggle-view-list" onclick="switchViewMode('list')" class="flex-1 py-2 text-xs font-bold rounded-xl bg-white text-black active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5">
+                    <i data-lucide="list" class="w-3.5 h-3.5"></i> List View
+                </button>
+                <button id="toggle-view-bracket" onclick="switchViewMode('bracket')" class="flex-1 py-2 text-xs font-bold rounded-xl text-zinc-400 hover:text-white active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5">
+                    <i data-lucide="git-branch" class="w-3.5 h-3.5"></i> Bracket View
+                </button>
+            </div>
+        </div>
+
+<div id="home-list-wrapper" class="flex flex-col flex-grow">
+<!-- Horizontal Date Swiper (横向日期选择器) -->
         <div id="date-swiper" class="px-5 pt-4 flex gap-3 overflow-x-auto no-scrollbar scroll-smooth">
             <!-- 由 JS 动态加载 -->
         </div>
@@ -1417,6 +1587,15 @@
                 </div>
             </div>
         </main>
+        </div>
+
+        <!-- 淘汰赛对阵图容器 -->
+        <div id="home-bracket-wrapper" class="hidden flex-col flex-grow px-5 pt-4 pb-8">
+            <div id="yejiu-bracket-board" class="yejiu-bracket-board">
+                <!-- JS 动态加载 -->
+            </div>
+        </div>
+        
 
         <!-- 页面页脚说明 -->
         <footer class="mt-10 text-center text-zinc-700 text-[10px] px-5 space-y-1.5">
@@ -3755,6 +3934,22 @@ const CUSTOM_MATCH_ADVICE = {
             70: { aspect: "🌅 早八/通勤档摸鱼局！巴拿马 VS 克罗地亚。在早自习或早会打卡的边缘，绿茵的火种已在屏幕悄然点燃。 关注巴拿马的“核心”卡拉斯奎拉，与克罗地亚“传奇大师”莫德里奇（迎来最后一舞）与格瓦迪奥尔的正面交锋！", prescription: "手机支架夹好，蓝牙耳机戴单耳（留一只耳朵防突击检查）。如果昨晚睡得够，上午一杯冰美式续命，摸鱼姿势要优雅。" },
             71: { aspect: "🌌【深夜鏖战】巴拿马 VS 英格兰！“核心”卡拉斯奎拉正面对决由贝林厄姆、凯恩、萨卡，以及本赛季在俱乐部几乎燃尽的后腰铁闸赖斯、中场多面手奥赖利及飞翼马杜埃凯领衔的三狮军团。巴拿马（运河狂飙，打法直接快速）和英格兰（三狮军团由图赫尔执教，阵容厚度惊人，飞翼马杜埃凯作为萨卡的强力替补随时待命）的博弈，火星撞地球！", prescription: "凌晨 5 点魔鬼场！前置深睡 2 小时是最低防线。中场冰水洗脸，完场后避开网络对线立刻睡觉，中午功率小憩 20 分钟补足精神。" },
             72: { aspect: "🌌【深夜鏖战】克罗地亚 VS 加纳！“传奇大师”莫德里奇（最后一舞）和 格瓦迪奥尔正面对决“黑星新王”库杜斯和伊尼亚基·威廉姆斯。克罗地亚（格子军团，坚韧不拔的加时赛之王，莫德里奇的世界杯绝唱）和 加纳（黑星军团，非洲顶级奔跑怪与反击爆点）的博弈，火星撞地球！", prescription: "凌晨 5 点魔鬼场！前置深睡 2 小时是最低防线。中场冰水洗脸，完场后避开网络对线立刻睡觉，中午功率小憩 20 分钟补足精神。" },
+            73: { aspect: "🇿🇦 South Africa vs 🇨🇦 Canada. The knockout stage opener! Alphonso Davies leads the Maple Leafs with blistering pace against South Africa's resilient and physical setup. Speed meets strength in a winner-takes-all clash!", prescription: "Late-night peak match! Keep warm water by your bed. Go straight to sleep after the game, and take a 20-minute power nap tomorrow noon." },
+            74: { aspect: "🇩🇪 Germany vs 🇵🇾 Paraguay. Nagelsmann's dynamic duo 'Wusiala' (Wirtz + Musiala) are set to unlock Paraguay's low block. Miguel Almirón leads Paraguay's resilient South American defence. Can Germany's tactical intelligence break the iron wall?", prescription: "Late-night battle! Avoid social media debates post-match and sleep immediately. Have a black coffee tomorrow morning to power through." },
+            75: { aspect: "🇳🇱 Netherlands vs 🇲🇦 Morocco. Cody Gakpo and Memphis Depay lead the Oranje against Achraf Hakimi and Yassine Bounou's steel Moroccan defensive wall. A tactical chess match between fluid Total Football and North African resilience!", prescription: "1 AM kickoff! Make sure to take a 1.5-hour nap beforehand. Wash your face with cold water at halftime and sleep immediately after." },
+            76: { aspect: "🇧🇷 Brazil vs 🇯🇵 Japan. Vinicius Jr, Rodrygo and Endrick bring Samba flair against Kaoru Mitoma and Takefusa Kubo's highly disciplined Blue Samurai. High-pressing tactical discipline meets individual genius!", prescription: "Commute/work peak match! Put on your single earbud, hide your screen gracefully, and keep a cold Americano close by." },
+            77: { aspect: "🇫🇷 France vs 🇸🇪 Sweden. Kylian Mbappé and Griezmann lead Les Bleus against Sweden's formidable attacking trio of Isak, Kulusevski, and Gyökeres. High-speed transition meets Nordic aerial threat!", prescription: "Late-night peak match! Keep warm water by your bed. Go straight to sleep after the game, and take a 20-minute power nap tomorrow noon." },
+            78: { aspect: "🇨🇮 Ivory Coast vs 🇳🇴 Norway. Sébastien Haller and Franck Kessié face the Nordic attack led by Erling Haaland and Martin Ødegaard. Physical African titans against Norway's golden playmaking duo!", prescription: "Prime time viewing! Zero pressure on sleep. Stay hydrated, prepare some healthy snacks, and enjoy the beautiful game." },
+            79: { aspect: "🇲🇽 Mexico vs 🇪🇨 Ecuador. The co-hosts play in front of a roaring home crowd against El Tri's rivals. Chelsea's Moisés Caicedo controls Ecuador's midfield against Edson Álvarez's defensive shield. High intensity assured!", prescription: "Late-night peak match! Keep warm water by your bed. Go straight to sleep after the game, and take a 20-minute power nap tomorrow noon." },
+            80: { aspect: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇨🇩 Congo DR. Thomas Tuchel's Three Lions, starring Jude Bellingham and Harry Kane, implement their 'Finishers' substitute strategy against the highly athletic Congolese Leopards. A true test of squad depth!", prescription: "Golden daytime slot! No sleep deprivation risk. Remember to stay hydrated, stretch during halftime, and avoid prolonged sitting." },
+            81: { aspect: "🇺🇸 United States vs 🇧🇦 Bosnia. Mauricio Pochettino leads the co-hosts with Christian Pulisic and Weston McKennie, facing Edin Džeko's experienced Bosnian side. A massive home test for the USMNT!", prescription: "Prime time viewing! Zero pressure on sleep. Stay hydrated, prepare some healthy snacks, and enjoy the beautiful game." },
+            82: { aspect: "🇧🇪 Belgium vs 🇸🇳 Senegal. Kevin De Bruyne and Romelu Lukaku lead the Red Devils against Sadio Mané and Nicolas Jackson's Teranga Lions. Masterful playmaking vs blistering African pace!", prescription: "Late-night battle! Avoid social media debates post-match and sleep immediately. Have a black coffee tomorrow morning to power through." },
+            83: { aspect: "🇪🇸 Spain vs 🇦🇹 Austria. 18-year-old superstar Lamine Yamal and Nico Williams spearhead Spain's attack against Ralf Rangnick's high-intensity Gegenpressing Austrian machine. Tiki-taka meets modern press!", prescription: "Late-night peak match! Keep warm water by your bed. Go straight to sleep after the game, and take a 20-minute power nap tomorrow noon." },
+            84: { aspect: "🇵🇹 Portugal vs 🇭🇷 Croatia. An epic clash of legends! 41-year-old Cristiano Ronaldo and 40-year-old Luka Modrić meet in their final World Cup knockout run. Two Real Madrid icons, one last dance!", prescription: "Late-night peak match! Keep warm water by your bed. Go straight to sleep after the game, and take a 20-minute power nap tomorrow noon." },
+            85: { aspect: "🇨🇭 Switzerland vs 🇩🇿 Algeria. Granit Xhaka's tactically organized Swiss side faces Riyad Mahrez and Algeria's individual flair and technical brilliance. Organization meets creative freedom!", prescription: "3 AM kickoff! Take a 2-hour nap before the match. Wash your face with cold water at halftime and sleep immediately after." },
+            86: { aspect: "🇦🇷 Argentina vs 🇨🇻 Cape Verde. The defending champions begin their knockout defense. Lionel Messi, in his sixth World Cup, leads Julian Alvarez and Enzo Fernandez against Cape Verde, the ultimate dark horses of the tournament!", prescription: "1 AM kickoff! Take a 2-hour nap before the match. Wash your face with cold water at halftime and sleep immediately after." },
+            87: { aspect: "🇨🇴 Colombia vs 🇬🇭 Ghana. Luis Díaz leads Colombia's South American flair against West Ham's Mohammed Kudus and Ghana's physical, high-tempo African transition. A highly explosive matchup!", prescription: "Prime time viewing! Zero pressure on sleep. Stay hydrated, prepare some healthy snacks, and enjoy the beautiful game." },
+            88: { aspect: "🇦🇺 Australia vs 🇪🇬 Egypt. Australia's physical and aerial presence clashes with Egypt led by Liverpool's king Mohamed Salah. Salah's quest for knockout glory meets the tough Socceroos!", prescription: "Prime time viewing! Zero pressure on sleep. Stay hydrated, prepare some healthy snacks, and enjoy the beautiful game." },
         };
 
         function generateDynamicAdvice(match, hours) {
@@ -7319,7 +7514,7 @@ function closeEmergencyModal() {
             if (view === 'health') renderHealthView();
             if (view === 'archives') renderArchivesView(currentArchivesTab);
             if (view === 'profile') renderProfileView();
-            if (view === 'home') { renderMatches(); renderStats(); }
+            if (view === 'home') { if (currentViewMode === 'bracket') { renderBracketView(); } else { renderMatches(); renderStats(); } }
 
             if (options.scroll !== false) {
                 window.scrollTo({ top: 0, behavior: 'instant' });
@@ -15090,7 +15285,283 @@ function generateDailyStatus(checkins, dateStr) {
             const text = titleLine + "\n" + secondLine + "\n\n我用夜啾生成了自己的世界杯观赛卡。" + (url && url !== '夜啾' ? "\n" + url : '');
             return { title, text, url, titleLine, secondLine };
         }
-                </script>
+                
+        // ── 淘汰赛对阵图 ──
+        let currentViewMode = 'list';
+        const BRACKET_ROUNDS = [
+            {
+                name: "32强淘汰赛",
+                nameEn: "Round of 32",
+                matchIds: [74, 77, 73, 75, 83, 84, 81, 82, 76, 78, 79, 80, 86, 88, 85, 87]
+            },
+            {
+                name: "1/8决赛",
+                nameEn: "Round of 16",
+                matchIds: [89, 90, 93, 94, 91, 92, 95, 96]
+            },
+            {
+                name: "1/4决赛",
+                nameEn: "Quarter-Finals",
+                matchIds: [97, 98, 99, 100]
+            },
+            {
+                name: "半决赛",
+                nameEn: "Semi-Finals",
+                matchIds: [101, 102]
+            },
+            {
+                name: "决赛",
+                nameEn: "Finals",
+                matchIds: [104, 103]
+            }
+        ];
+
+        function switchViewMode(mode) {
+            currentViewMode = mode;
+            const listWrapper = document.getElementById('home-list-wrapper');
+            const bracketWrapper = document.getElementById('home-bracket-wrapper');
+            const btnList = document.getElementById('toggle-view-list');
+            const btnBracket = document.getElementById('toggle-view-bracket');
+            const isEn = window.location.pathname.includes('/en/') || document.documentElement.lang === 'en';
+            
+            if (mode === 'bracket') {
+                if (listWrapper) listWrapper.classList.add('hidden');
+                if (bracketWrapper) {
+                    bracketWrapper.classList.remove('hidden');
+                    bracketWrapper.classList.add('flex');
+                }
+                if (btnList) {
+                    btnList.className = "flex-1 py-2 text-xs font-bold rounded-xl text-zinc-400 hover:text-white active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5";
+                }
+                if (btnBracket) {
+                    btnBracket.className = "flex-1 py-2 text-xs font-bold rounded-xl bg-white text-black active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5";
+                }
+                renderBracketView();
+            } else {
+                if (listWrapper) listWrapper.classList.remove('hidden');
+                if (bracketWrapper) {
+                    bracketWrapper.classList.add('hidden');
+                    bracketWrapper.classList.remove('flex');
+                }
+                if (btnList) {
+                    btnList.className = "flex-1 py-2 text-xs font-bold rounded-xl bg-white text-black active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5";
+                }
+                if (btnBracket) {
+                    btnBracket.className = "flex-1 py-2 text-xs font-bold rounded-xl text-zinc-400 hover:text-white active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5";
+                }
+                renderMatches();
+                renderStats();
+            }
+            refreshLucideIcons();
+        }
+
+        function renderBracketView() {
+            const board = document.getElementById('yejiu-bracket-board');
+            if (!board) return;
+            board.innerHTML = '';
+            
+            const isEn = window.location.pathname.includes('/en/') || document.documentElement.lang === 'en';
+
+            BRACKET_ROUNDS.forEach(round => {
+                const col = document.createElement('div');
+                col.className = 'bracket-column';
+                
+                const title = document.createElement('div');
+                title.className = 'bracket-round-title';
+                title.textContent = isEn ? round.nameEn : round.name;
+                col.appendChild(title);
+                
+                round.matchIds.forEach(matchId => {
+                    const match = matchData.find(m => m.id === matchId);
+                    if (!match) return;
+                    
+                    const node = document.createElement('div');
+                    node.className = 'bracket-match-node';
+                    
+                    const isSubbed = subbedMatches.includes(match.id);
+                    const isFinished = match.status === 'finished';
+                    const hasWinner = isFinished && Number.isFinite(match.scoreA) && Number.isFinite(match.scoreB);
+                    const winnerClassA = hasWinner && match.scoreA > match.scoreB ? 'winner' : '';
+                    const winnerClassB = hasWinner && match.scoreB > match.scoreA ? 'winner' : '';
+                    
+                    const scoreAStr = Number.isFinite(match.scoreA) ? match.scoreA : (isFinished ? '0' : '-');
+                    const scoreBStr = Number.isFinite(match.scoreB) ? match.scoreB : (isFinished ? '0' : '-');
+                    
+                    const timeInfo = parseMatchTime(match.utcTime);
+                    
+                    const card = document.createElement('div');
+                    card.className = `bracket-match-card ${isSubbed ? 'subbed' : ''} ${isFinished ? 'finished' : ''}`;
+                    card.onclick = () => showMatchDetailModal(match.id);
+                    
+                    let statusLabel = isFinished ? (isEn ? 'Finished' : '已结束') : timeInfo.bjTimeStr.split(' ')[1];
+                    if (match.status === 'live' || match.status === 'in_play') {
+                        statusLabel = isEn ? 'LIVE' : '直播中';
+                    }
+                    
+                    card.innerHTML = `
+                        <div class="bracket-team-row ${winnerClassA}">
+                            <div class="bracket-team-info">
+                                <span class="text-base leading-none">${match.flagA || '🏳️'}</span>
+                                <span class="bracket-team-name">${match.teamA || (isEn ? 'TBD' : '未定')}</span>
+                            </div>
+                            <span class="bracket-team-score">${scoreAStr}</span>
+                        </div>
+                        <div class="bracket-team-row ${winnerClassB}">
+                            <div class="bracket-team-info">
+                                <span class="text-base leading-none">${match.flagB || '🏳️'}</span>
+                                <span class="bracket-team-name">${match.teamB || (isEn ? 'TBD' : '未定')}</span>
+                            </div>
+                            <span class="bracket-team-score">${scoreBStr}</span>
+                        </div>
+                        <div class="bracket-card-meta">
+                            <span>W${match.id} · ${isEn ? match.stage.trim() : match.stage.trim()}</span>
+                            <div class="flex items-center gap-1">
+                                ${isSubbed ? '<i data-lucide="bell" class="w-3 h-3 text-[#00e676]"></i>' : ''}
+                                <span>${statusLabel}</span>
+                            </div>
+                        </div>
+                    `;
+                    node.appendChild(card);
+                    col.appendChild(node);
+                });
+                board.appendChild(col);
+            });
+            refreshLucideIcons();
+        }
+
+        function showMatchDetailModal(matchId) {
+            const match = matchData.find(m => m.id === matchId);
+            if (!match) return;
+            
+            const modal = document.getElementById('yejiu-match-modal');
+            const content = document.getElementById('match-modal-content');
+            if (!modal || !content) return;
+            
+            const isEn = window.location.pathname.includes('/en/') || document.documentElement.lang === 'en';
+            const isSubbed = subbedMatches.includes(match.id);
+            const timeInfo = parseMatchTime(match.utcTime);
+            
+            let warningBgClass = 'bg-zinc-900 border-zinc-800';
+            let warningTextClass = 'text-zinc-400';
+            let warningDotClass = 'bg-zinc-500';
+            if (timeInfo.warningType === 'danger') {
+                warningBgClass = 'bg-rose-950/20 border-rose-900/30';
+                warningTextClass = 'text-rose-400';
+                warningDotClass = 'bg-rose-500 animate-pulse';
+            } else if (timeInfo.warningType === 'challenge') {
+                warningBgClass = 'bg-amber-950/20 border-amber-900/30';
+                warningTextClass = 'text-amber-400';
+                warningDotClass = 'bg-amber-500';
+            } else if (timeInfo.warningType === 'normal') {
+                warningBgClass = 'bg-emerald-950/20 border-emerald-900/30';
+                warningTextClass = 'text-emerald-400';
+                warningDotClass = 'bg-emerald-500';
+            }
+            
+            const adviceDetails = generateDynamicAdvice(match, timeInfo.hours);
+            
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between pb-2 border-b border-zinc-800/60">
+                        <span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                            W${match.id} · ${isEn ? match.stage.trim() : match.stage.trim()}
+                        </span>
+                        <div class="px-2.5 py-0.5 rounded-full border text-[9px] font-bold flex items-center gap-1.5 ${warningBgClass} ${warningTextClass}">
+                            <span class="w-1.5 h-1.5 rounded-full ${warningDotClass}"></span>
+                            ${timeInfo.warningTag}
+                        </div>
+                    </div>
+                    
+                    <div class="py-3 flex items-center justify-center gap-6">
+                        <div class="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+                            <span class="text-4xl leading-none">${match.flagA || '🏳️'}</span>
+                            <span class="text-xs font-black text-white truncate text-center w-full">${match.teamA || (isEn ? 'TBD' : '未定')}</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-2xl font-black text-white font-mono">
+                                ${Number.isFinite(match.scoreA) ? match.scoreA : '-'} : ${Number.isFinite(match.scoreB) ? match.scoreB : '-'}
+                            </span>
+                            <span class="text-[9px] text-zinc-650 font-bold uppercase tracking-wider mt-1">VS</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+                            <span class="text-4xl leading-none">${match.flagB || '🏳️'}</span>
+                            <span class="text-xs font-black text-white truncate text-center w-full">${match.teamB || (isEn ? 'TBD' : '未定')}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-black/40 border border-white/[0.04] p-3 rounded-2xl flex items-center gap-3">
+                        <i data-lucide="clock" class="w-4 h-4 text-zinc-500 shrink-0"></i>
+                        <div class="text-left">
+                            <div class="text-[9px] text-zinc-600 font-semibold uppercase tracking-wider leading-none">${isEn ? 'Match Time' : '比赛时间'}</div>
+                            <div class="text-[11px] font-bold text-white mt-1 leading-none">${timeInfo.bjTimeStr}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-1 text-left">
+                        <div class="text-[9px] text-zinc-600 font-semibold uppercase tracking-wider leading-none">${isEn ? 'Match Aspect' : '对决看点'}</div>
+                        <p class="text-xs text-zinc-300 leading-relaxed font-medium mt-1">${adviceDetails.aspect}</p>
+                    </div>
+                    
+                    <div class="space-y-1 text-left">
+                        <div class="text-[9px] text-zinc-600 font-semibold uppercase tracking-wider leading-none">${isEn ? 'Health Advice' : '健康建议'}</div>
+                        <p class="text-xs text-zinc-400 leading-relaxed mt-1">${adviceDetails.prescription}</p>
+                    </div>
+                    
+                    <div class="pt-3">
+                        <button id="modal-sub-btn-${match.id}" onclick="toggleModalSubscription(${match.id}, event)" class="w-full py-3 rounded-2xl text-xs font-black active:scale-[0.97] transition-all flex items-center justify-center gap-1.5 ${isSubbed ? 'bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white' : 'bg-[#00e676] text-black hover:bg-[#00c862] shadow-[0_4px_20px_rgba(0,230,118,0.15)]'}">
+                            <i data-lucide="${isSubbed ? 'bell-off' : 'bell'}" class="w-4 h-4"></i>
+                            <span>${isSubbed ? (isEn ? 'Unsubscribe' : '取消提醒') : (isEn ? 'Subscribe' : '订阅提醒')}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            refreshLucideIcons();
+        }
+        
+        function closeMatchModal() {
+            const modal = document.getElementById('yejiu-match-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+        
+        function toggleModalSubscription(matchId, event) {
+            toggleSubscribe(matchId, event);
+            updateModalSubscriptionButton(matchId);
+            if (typeof renderBracketView === 'function') {
+                renderBracketView();
+            }
+        }
+        
+        function updateModalSubscriptionButton(matchId) {
+            const btn = document.getElementById(`modal-sub-btn-${matchId}`);
+            if (!btn) return;
+            const isEn = window.location.pathname.includes('/en/') || document.documentElement.lang === 'en';
+            const isSubbed = subbedMatches.includes(matchId);
+            if (isSubbed) {
+                btn.className = "w-full py-3 rounded-2xl text-xs font-black active:scale-[0.97] transition-all flex items-center justify-center gap-1.5 bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white";
+                btn.innerHTML = `<i data-lucide="bell-off" class="w-4 h-4"></i><span>${isEn ? 'Unsubscribe' : '取消提醒'}</span>`;
+            } else {
+                btn.className = "w-full py-3 rounded-2xl text-xs font-black active:scale-[0.97] transition-all flex items-center justify-center gap-1.5 bg-[#00e676] text-black hover:bg-[#00c862] shadow-[0_4px_20px_rgba(0,230,118,0.15)]";
+                btn.innerHTML = `<i data-lucide="bell" class="w-4 h-4"></i><span>${isEn ? 'Subscribe' : '订阅提醒'}</span>`;
+            }
+            refreshLucideIcons();
+        }
+
+        // Setup backdrop click close
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalEl = document.getElementById('yejiu-match-modal');
+            if (modalEl) {
+                modalEl.addEventListener('click', (e) => {
+                    if (e.target === modalEl) closeMatchModal();
+                });
+            }
+        });
+</script>
     <!-- ============ 头像选择模态弹窗 ============ -->
     <div id="avatar-selector-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[9999] hidden items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-900 rounded-2xl w-full max-w-sm h-[75vh] flex flex-col overflow-hidden animate-fade-in shadow-2xl">
@@ -15164,6 +15635,19 @@ function generateDailyStatus(checkins, dateStr) {
                         <i data-lucide="upload" class="w-3 h-3"></i> 开始恢复数据
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 世界杯场次浮空指南弹窗 ============ -->
+    <div id="yejiu-match-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in yejiu-match-modal-backdrop">
+        <div class="relative w-full max-w-sm bg-[#141414]/90 border border-white/[0.08] rounded-3xl p-6 shadow-2xl space-y-4 overflow-hidden yejiu-match-modal-box">
+            <!-- 关闭按钮 -->
+            <button onclick="closeMatchModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-90" aria-label="关闭">
+                &times;
+            </button>
+            <!-- 弹层动态内容 -->
+            <div id="match-modal-content">
             </div>
         </div>
     </div>
